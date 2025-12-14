@@ -1,0 +1,10 @@
+in stories, if i swipe  right side of the cscreen i go to the next story and if i swipe left i should go to the previous one. if i hold on to the story it freezes in time. if i double click the story it means i liked it and then put a small red heart emoji at the bottom right corner of that story if i had liked it.when i click  on a story i should only see the story page and not the menu which is at the bottom of the screen
+
+on the home page, on the posts, remove"podcast clip" element and the duration of the reel. also if i click on any post:direct me to the reels page strting from that post. remove the "@" under the account name. add a follow button right beside the account name. remove the 3 dots near the account name on the posts.
+
+on the home page, at the top right, the red dot on the notification symbol is misplaced. fix it. also to the left of that symbol add a symbol which takes me to a menu for messaging.
+
+in the explore page,under trending for you:evenly spaced rectangular content tiles with generous white/negative space converted here into soft dark spacing, maintaining calm visual rhythm and readability. The feed should feel structured, breathable, and intentional—designed for exploration without overwhelm. Use consistent margins, subtle separators, and restrained motion to guide the eye naturally. Overall, the Explore Page should feel curated, elegant, and discovery-driven, encouraging users to explore new self-improvement content while staying grounded in Bitecast’s refined, distraction-free design philosophy. that is, for each genre there should be a carousel of vertical rectangles . each rectangle representing a reel and if i click on that rectangle, i get redirected to the reels feed starting from that particular reel.
+
+
+in the reels page: remove the word"reel" from the top left and the mute option from the top right. remove the feature which shows the audio being used. the hashtags and the description should be hidden and can be seen when i click on the three dots symbol. add a not interested button's emoji as well below the like button and above the comments

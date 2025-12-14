@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { Heart, MessageCircle, Send, MoreVertical, Volume2, VolumeX, Pause, Play } from "lucide-react";
+import { Heart, MessageCircle, Send, MoreVertical, Ban } from "lucide-react"; // Import Ban for "Not Interested"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
 import reelThumb from "@assets/generated_images/moody_nature_reel_thumbnail.png";
+import { Button } from "@/components/ui/button";
 
 // Mock Data
 const REELS = [
   {
     id: 1,
-    video: "https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5016-large.mp4", // Placeholder nature video
+    video: "https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5016-large.mp4",
     author: "Mindset Daily",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces",
     description: "The power of silence in a noisy world. #mindfulness #peace",
@@ -29,10 +30,10 @@ const REELS = [
 export default function ReelsPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
+  const [showInfo, setShowInfo] = useState(false); // Toggle for description/hashtags
 
   const togglePlay = () => setIsPlaying(!isPlaying);
-  const toggleMute = () => setIsMuted(!isMuted);
+  const toggleInfo = () => setShowInfo(!showInfo); // Toggle visibility
 
   const currentReel = REELS[currentIndex];
 
@@ -40,24 +41,20 @@ export default function ReelsPage() {
     <div className="h-full w-full bg-black relative overflow-hidden">
       {/* Video Player Background */}
       <div className="absolute inset-0 z-0 bg-neutral-900">
-         {/* In a real app, use a proper Video component with IntersectionObserver */}
          <video 
            src={currentReel.video} 
            className="w-full h-full object-cover opacity-90"
            autoPlay
            loop
-           muted={isMuted}
+           muted={false} // Removed mute option, assuming sound on by default or controlled by device
            playsInline
          />
          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
       </div>
 
-      {/* Top Bar */}
+      {/* Top Bar - REMOVED "Reels" text and Mute button */}
       <div className="absolute top-0 left-0 right-0 z-10 p-4 pt-6 flex justify-between items-center text-white">
-        <h2 className="font-display font-medium text-lg drop-shadow-md">Reels</h2>
-        <button onClick={toggleMute} className="p-2 bg-black/20 backdrop-blur-md rounded-full">
-          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-        </button>
+        {/* Empty top bar now */}
       </div>
 
       {/* Center Play/Pause Overlay Interaction */}
@@ -65,11 +62,7 @@ export default function ReelsPage() {
         className="absolute inset-0 z-0 flex items-center justify-center cursor-pointer"
         onClick={togglePlay}
       >
-        {!isPlaying && (
-          <div className="w-16 h-16 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center">
-            <Play fill="white" className="ml-1 text-white w-8 h-8" />
-          </div>
-        )}
+        {/* No play icon overlay needed usually for reels unless paused explicitly, keeping clean */}
       </div>
 
       {/* Right Sidebar Actions */}
@@ -88,6 +81,13 @@ export default function ReelsPage() {
           <span className="text-xs font-medium text-white drop-shadow-md">{currentReel.likes}</span>
         </div>
 
+        {/* Not Interested Button */}
+         <div className="flex flex-col items-center gap-1">
+          <button className="p-2 rounded-full hover:bg-white/10 transition-colors" title="Not Interested">
+            <span className="text-2xl drop-shadow-sm">👎</span> {/* Emoji for Not Interested */}
+          </button>
+        </div>
+
         <div className="flex flex-col items-center gap-1">
           <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
             <MessageCircle size={28} className="text-white drop-shadow-sm" />
@@ -99,29 +99,45 @@ export default function ReelsPage() {
           <Send size={28} className="text-white drop-shadow-sm -rotate-45" />
         </button>
 
-        <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
+        <button 
+          className="p-2 rounded-full hover:bg-white/10 transition-colors"
+          onClick={toggleInfo} // Click 3 dots to show info
+        >
           <MoreVertical size={24} className="text-white drop-shadow-sm" />
         </button>
       </div>
 
-      {/* Bottom Info */}
-      <div className="absolute left-0 bottom-20 z-10 p-4 w-[80%] text-white">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="font-semibold text-sm">{currentReel.author}</span>
-          <button className="px-2 py-0.5 rounded-md border border-white/30 text-[10px] font-medium backdrop-blur-sm">Follow</button>
-        </div>
-        <p className="text-sm opacity-90 leading-relaxed drop-shadow-md">
-          {currentReel.description}
-        </p>
-        <div className="mt-3 flex items-center gap-2 opacity-70">
-           <div className="flex gap-0.5 items-end h-3">
-             <div className="w-0.5 h-2 bg-white animate-pulse" />
-             <div className="w-0.5 h-3 bg-white animate-pulse delay-75" />
-             <div className="w-0.5 h-1.5 bg-white animate-pulse delay-150" />
-           </div>
-           <span className="text-xs">Original Audio - {currentReel.author}</span>
-        </div>
-      </div>
+      {/* Bottom Info - HIDDEN by default, shown on click of 3 dots */}
+      <AnimatePresence>
+        {showInfo && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="absolute left-0 bottom-20 z-10 p-4 w-[80%] text-white bg-black/40 backdrop-blur-md rounded-tr-2xl rounded-br-2xl"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-semibold text-sm">{currentReel.author}</span>
+              <button className="px-2 py-0.5 rounded-md border border-white/30 text-[10px] font-medium backdrop-blur-sm">Follow</button>
+            </div>
+            <p className="text-sm opacity-90 leading-relaxed drop-shadow-md">
+              {currentReel.description}
+            </p>
+            {/* Removed Audio Info */}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* If info is hidden, maybe just show author name small? Or nothing as requested? 
+          "hashtags and description should be hidden" implies completely hidden.
+          But usually you need to see who posted it. Keeping it completely hidden as requested until toggle.
+      */}
+      {!showInfo && (
+         <div className="absolute left-4 bottom-8 z-10 text-white opacity-80 text-xs">
+            {/* Minimal persistent indicator if needed, otherwise empty */}
+            @{currentReel.author.replace(" ", "").toLowerCase()}
+         </div>
+      )}
     </div>
   );
 }

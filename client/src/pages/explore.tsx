@@ -20,6 +20,8 @@ const EXPLORE_FEED = [
   { id: 2, title: "Sleep Smarter", author: "Shawn Stevenson", category: "Health", img: "https://images.unsplash.com/photo-1511296933631-18b5f0bc0846?w=800&q=80" },
   { id: 3, title: "Financial Freedom", author: "Morgan Housel", category: "Wealth", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80" },
   { id: 4, title: "Building Trust", author: "Simon Sinek", category: "Relationships", img: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80" },
+  { id: 5, title: "The Power of Now", author: "Eckhart Tolle", category: "Spirituality", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80" },
+  { id: 6, title: "Atomic Habits", author: "James Clear", category: "Mindset", img: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=800&q=80" },
 ];
 
 export default function ExplorePage() {
@@ -77,36 +79,47 @@ export default function ExplorePage() {
         ))}
       </div>
 
-      {/* Vertical Feed */}
-      <div className="space-y-4 pt-2">
+      {/* Vertical Feed - UPDATED for better spacing and layout */}
+      <div className="space-y-6 pt-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Trending for you</h2>
           <span className="text-xs text-accent cursor-pointer">View all</span>
         </div>
         
-        {EXPLORE_FEED.map((item, i) => (
-          <motion.div 
-            key={item.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 + (i * 0.05) }}
-            className="flex gap-4 p-3 rounded-2xl bg-card/40 border border-white/5 hover:bg-card/60 transition-colors cursor-pointer"
-          >
-            <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0">
-              <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
-            </div>
-            <div className="flex flex-col justify-center flex-1 min-w-0">
-              <span className="text-[10px] text-accent font-medium mb-1">{item.category}</span>
-              <h4 className="font-medium text-sm leading-tight mb-1 truncate">{item.title}</h4>
-              <p className="text-xs text-muted-foreground">{item.author}</p>
-            </div>
-            <div className="flex items-center justify-center shrink-0 w-8">
-               <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
-                 <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
-               </div>
-            </div>
-          </motion.div>
-        ))}
+        <div className="grid grid-cols-1 gap-6"> {/* Increased gap for generous spacing */}
+          {EXPLORE_FEED.map((item, i) => (
+            <motion.div 
+              key={item.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + (i * 0.05) }}
+              className="group cursor-pointer"
+            >
+              {/* More spacious card layout */}
+              <div className="flex gap-5 items-start">
+                 <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 shadow-lg relative">
+                   <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                   <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                 </div>
+                 
+                 <div className="flex flex-col flex-1 py-1 space-y-2">
+                   <span className="text-[10px] text-accent font-semibold tracking-wider uppercase">{item.category}</span>
+                   <h4 className="font-display font-medium text-lg leading-tight text-white group-hover:text-primary transition-colors">{item.title}</h4>
+                   <p className="text-sm text-muted-foreground">{item.author}</p>
+                 </div>
+
+                 <div className="self-center opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
+                    <ArrowUpRight className="text-white w-5 h-5" />
+                 </div>
+              </div>
+              
+              {/* Subtle separator except for last item */}
+              {i < EXPLORE_FEED.length - 1 && (
+                <div className="mt-6 h-px bg-white/5 w-full" />
+              )}
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );

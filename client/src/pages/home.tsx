@@ -1,10 +1,11 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Play, MoreHorizontal, Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
+import { Play, MoreHorizontal, Heart, MessageCircle, Share2, Bookmark, Bell, MessageSquare } from "lucide-react";
 import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 import cardImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import { motion } from "framer-motion";
+import { Link, useLocation } from "wouter";
 
 const STORIES = [
   { id: 1, name: "My Story", img: avatarImg, viewed: false },
@@ -47,21 +48,26 @@ const FEED_ITEMS = [
   },
 ];
 
-import { Link } from "wouter";
-
-// ... existing imports
-
 export default function HomePage() {
+  const [_, setLocation] = useLocation();
+
+  const handlePostClick = () => {
+    setLocation("/reels");
+  };
+
   return (
     <div className="pb-24 pt-4">
-      {/* Header / Status Bar Area - KEEP AS IS */}
+      {/* Header / Status Bar Area */}
       <div className="px-4 pb-4 flex justify-between items-center">
         <h1 className="font-display text-2xl font-semibold">Bitecast</h1>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
           <Button size="icon" variant="ghost" className="rounded-full w-8 h-8">
+            <MessageSquare size={20} />
+          </Button>
+          <Button size="icon" variant="ghost" className="rounded-full w-8 h-8 relative">
              <span className="sr-only">Notifications</span>
-             <div className="w-2 h-2 bg-red-500 rounded-full absolute top-2 right-2" />
-             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+             <div className="w-2 h-2 bg-red-500 rounded-full absolute top-1 right-1.5" />
+             <Bell size={20} />
           </Button>
         </div>
       </div>
@@ -89,7 +95,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Feed - KEEP AS IS */}
+      {/* Feed */}
       <div className="px-4 space-y-6">
         {FEED_ITEMS.map((item, i) => (
           <motion.div 
@@ -107,17 +113,20 @@ export default function HomePage() {
                   <AvatarFallback>{item.author[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium leading-none">{item.author}</span>
-                  <span className="text-[10px] text-muted-foreground">{item.handle}</span>
+                  <div className="flex items-center gap-2">
+                     <span className="text-sm font-medium leading-none">{item.author}</span>
+                     <button className="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-sm transition-colors text-white font-medium">Follow</button>
+                  </div>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                <MoreHorizontal size={16} />
-              </Button>
+              {/* Removed 3 dots */}
             </div>
 
             {/* Card Content */}
-            <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden group">
+            <div 
+              className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden group cursor-pointer"
+              onClick={handlePostClick}
+            >
               <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               
@@ -129,11 +138,7 @@ export default function HomePage() {
 
               <div className="absolute bottom-0 left-0 w-full p-4 space-y-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-medium text-white flex items-center gap-1">
-                    <div className="w-1 h-1 bg-red-500 rounded-full animate-pulse" />
-                    Podcast Clip
-                  </div>
-                  <span className="text-[10px] text-white/70">{item.duration}</span>
+                  {/* Removed Podcast Clip & Duration */}
                 </div>
                 <h3 className="text-lg font-display font-medium text-white leading-tight pr-4">
                   {item.title}
