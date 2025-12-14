@@ -47,10 +47,14 @@ const FEED_ITEMS = [
   },
 ];
 
+import { Link } from "wouter";
+
+// ... existing imports
+
 export default function HomePage() {
   return (
     <div className="pb-24 pt-4">
-      {/* Header / Status Bar Area */}
+      {/* Header / Status Bar Area - KEEP AS IS */}
       <div className="px-4 pb-4 flex justify-between items-center">
         <h1 className="font-display text-2xl font-semibold">Bitecast</h1>
         <div className="flex gap-4">
@@ -66,24 +70,26 @@ export default function HomePage() {
       <div className="pl-4 pb-6 overflow-x-auto no-scrollbar">
         <div className="flex gap-4">
           {STORIES.map((story) => (
-            <div key={story.id} className="flex flex-col items-center space-y-1.5 min-w-[70px]">
-              <div className={`p-[2px] rounded-full bg-gradient-to-tr ${story.viewed ? 'from-white/20 to-white/10' : 'from-accent to-purple-500'}`}>
-                <div className="p-[2px] bg-background rounded-full">
-                  <Avatar className="w-16 h-16 border-none">
-                    <AvatarImage src={story.img} className="object-cover" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
+            <Link key={story.id} href={`/story/${story.id}`}>
+              <div className="flex flex-col items-center space-y-1.5 min-w-[70px] cursor-pointer group">
+                <div className={`p-[2px] rounded-full bg-gradient-to-tr transition-transform duration-300 group-active:scale-95 ${story.viewed ? 'from-white/20 to-white/10' : 'from-accent to-purple-500'}`}>
+                  <div className="p-[2px] bg-background rounded-full">
+                    <Avatar className="w-16 h-16 border-none">
+                      <AvatarImage src={story.img} className="object-cover" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                  </div>
                 </div>
+                <span className="text-[10px] text-muted-foreground truncate w-full text-center">
+                  {story.name}
+                </span>
               </div>
-              <span className="text-[10px] text-muted-foreground truncate w-full text-center">
-                {story.name}
-              </span>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
 
-      {/* Feed */}
+      {/* Feed - KEEP AS IS */}
       <div className="px-4 space-y-6">
         {FEED_ITEMS.map((item, i) => (
           <motion.div 

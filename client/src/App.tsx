@@ -11,6 +11,8 @@ import ReelsPage from "@/pages/reels";
 import LibraryPage from "@/pages/library";
 import ProfilePage from "@/pages/profile";
 
+import StoryPage from "@/pages/story";
+
 function Router() {
   return (
     <Layout>
@@ -21,6 +23,7 @@ function Router() {
         <Route path="/reels" component={ReelsPage} />
         <Route path="/library" component={LibraryPage} />
         <Route path="/profile" component={ProfilePage} />
+        <Route path="/story/:id" component={StoryPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
