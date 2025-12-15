@@ -30,10 +30,8 @@ const REELS = [
 export default function ReelsPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [showInfo, setShowInfo] = useState(false); // Toggle for description/hashtags
 
   const togglePlay = () => setIsPlaying(!isPlaying);
-  const toggleInfo = () => setShowInfo(!showInfo); // Toggle visibility
 
   const currentReel = REELS[currentIndex];
 
@@ -101,43 +99,21 @@ export default function ReelsPage() {
 
         <button 
           className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          onClick={toggleInfo} // Click 3 dots to show info
         >
           <MoreVertical size={24} className="text-white drop-shadow-sm" />
         </button>
       </div>
 
-      {/* Bottom Info - HIDDEN by default, shown on click of 3 dots */}
-      <AnimatePresence>
-        {showInfo && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute left-0 bottom-20 z-10 p-4 w-[80%] text-white bg-black/40 backdrop-blur-md rounded-tr-2xl rounded-br-2xl"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <span className="font-semibold text-sm">{currentReel.author}</span>
-              <button className="px-2 py-0.5 rounded-md border border-white/30 text-[10px] font-medium backdrop-blur-sm">Follow</button>
-            </div>
-            <p className="text-sm opacity-90 leading-relaxed drop-shadow-md">
-              {currentReel.description}
-            </p>
-            {/* Removed Audio Info */}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* If info is hidden, maybe just show author name small? Or nothing as requested? 
-          "hashtags and description should be hidden" implies completely hidden.
-          But usually you need to see who posted it. Keeping it completely hidden as requested until toggle.
-      */}
-      {!showInfo && (
-         <div className="absolute left-4 bottom-8 z-10 text-white opacity-80 text-xs">
-            {/* Minimal persistent indicator if needed, otherwise empty */}
-            @{currentReel.author.replace(" ", "").toLowerCase()}
-         </div>
-      )}
+      {/* Bottom Info - Always visible */}
+      <div className="absolute left-0 bottom-20 z-10 p-4 pr-20 w-full text-white">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="font-semibold text-sm drop-shadow-md">{currentReel.author}</span>
+          <button className="px-2 py-0.5 rounded-md border border-white/30 text-[10px] font-medium backdrop-blur-sm hover-elevate active-elevate-2">Follow</button>
+        </div>
+        <p className="text-sm opacity-90 leading-relaxed drop-shadow-md">
+          {currentReel.description}
+        </p>
+      </div>
     </div>
   );
 }

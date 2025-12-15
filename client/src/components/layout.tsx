@@ -6,7 +6,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
   const isReels = location === "/reels";
+  const isStory = location.startsWith("/story/");
   const isLogin = location === "/auth";
+  const hideNavigation = isReels || isStory;
 
   if (isLogin) {
     return <main className="min-h-screen w-full bg-background text-foreground font-sans noise-bg">{children}</main>;
@@ -20,10 +22,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </main>
         
         {/* Bottom Navigation */}
-        <nav className={cn(
-          "w-full h-16 border-t border-white/5 flex items-center justify-around z-50 transition-colors duration-300",
-          isReels ? "absolute bottom-0 bg-transparent border-transparent bg-gradient-to-t from-black/80 to-transparent text-white" : "bg-background/80 backdrop-blur-lg"
-        )}>
+        {!hideNavigation && (
+          <nav className={cn(
+            "w-full h-16 border-t border-white/5 flex items-center justify-around z-50 transition-colors duration-300",
+            "bg-background/80 backdrop-blur-lg"
+          )}>
           <Link href="/" className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
             <Home size={22} strokeWidth={location === "/" ? 2.5 : 2} />
             <span className="text-[10px] font-medium">Home</span>
@@ -47,6 +50,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <span className="text-[10px] font-medium">Profile</span>
           </Link>
         </nav>
+        )}
       </div>
     </div>
   );

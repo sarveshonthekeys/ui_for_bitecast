@@ -130,20 +130,6 @@ export default function StoryPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
         </div>
 
-        {/* Progress Bar */}
-        <div className="absolute top-0 left-0 right-0 z-20 p-2 flex gap-1">
-          {STORIES_LIST.map((s, idx) => (
-             <div key={s.id} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-               <motion.div 
-                 className="h-full bg-white"
-                 initial={{ width: idx < currentIndex ? "100%" : "0%" }}
-                 animate={{ width: idx < currentIndex ? "100%" : idx === currentIndex ? `${progress}%` : "0%" }}
-                 transition={{ duration: 0 }} // Direct control
-               />
-             </div>
-          ))}
-        </div>
-
         {/* Header */}
         <div className="absolute top-4 left-0 right-0 z-20 p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
