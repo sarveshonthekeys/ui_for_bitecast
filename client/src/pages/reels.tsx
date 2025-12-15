@@ -155,7 +155,7 @@ export default function ReelsPage() {
       >
       </div>
 
-      <div className="absolute right-4 bottom-24 z-20 flex flex-col items-center gap-6">
+      <div className="absolute right-4 bottom-36 z-20 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-1">
           <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-like">
             <Heart size={28} className="text-white drop-shadow-sm" />
@@ -189,7 +189,7 @@ export default function ReelsPage() {
         </button>
       </div>
 
-      <div className="absolute left-0 bottom-20 z-10 p-4 pr-20 w-full text-white">
+      <div className="absolute left-0 bottom-10 z-10 p-4 pr-20 w-full text-white">
         <div className="flex items-center gap-3 mb-2">
           <Avatar className="w-10 h-10 border-2 border-white">
             <AvatarImage src={currentReel.avatar} />
@@ -217,14 +217,6 @@ export default function ReelsPage() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
-        {REELS.map((_, index) => (
-          <div 
-            key={index}
-            className={`w-1.5 h-1.5 rounded-full transition-colors ${index === currentIndex ? 'bg-white' : 'bg-white/30'}`}
-          />
-        ))}
-      </div>
     </div>
   );
 }
