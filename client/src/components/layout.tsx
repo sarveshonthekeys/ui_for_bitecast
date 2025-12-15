@@ -24,37 +24,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           "w-full h-16 border-t border-white/5 flex items-center justify-around z-50 transition-colors duration-300",
           isReels ? "absolute bottom-0 bg-transparent border-transparent bg-gradient-to-t from-black/80 to-transparent text-white" : "bg-background/80 backdrop-blur-lg"
         )}>
-          <Link href="/">
-            <a className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
-              <Home size={22} strokeWidth={location === "/" ? 2.5 : 2} />
-              <span className="text-[10px] font-medium">Home</span>
-            </a>
+          <Link href="/" className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
+            <Home size={22} strokeWidth={location === "/" ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">Home</span>
           </Link>
-          <Link href="/explore">
-            <a className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/explore" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
-              <Compass size={22} strokeWidth={location === "/explore" ? 2.5 : 2} />
-              <span className="text-[10px] font-medium">Explore</span>
-            </a>
+          <Link href="/explore" className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/explore" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
+            <Compass size={22} strokeWidth={location === "/explore" ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">Explore</span>
           </Link>
-          <Link href="/reels">
-            <a className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/reels" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
-              <div className={cn("rounded-full p-1", isReels ? "bg-white/10" : "")}>
-                <Radio size={24} strokeWidth={location === "/reels" ? 2.5 : 2} />
-              </div>
-              <span className="text-[10px] font-medium">Reels</span>
-            </a>
+          <Link href="/reels" className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/reels" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
+            <div className={cn("rounded-full p-1", isReels ? "bg-white/10" : "")}>
+              <Radio size={24} strokeWidth={location === "/reels" ? 2.5 : 2} />
+            </div>
+            <span className="text-[10px] font-medium">Reels</span>
           </Link>
-          <Link href="/library">
-            <a className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/library" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
-              <Library size={22} strokeWidth={location === "/library" ? 2.5 : 2} />
-              <span className="text-[10px] font-medium">Library</span>
-            </a>
+          <Link href="/library" className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/library" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
+            <Library size={22} strokeWidth={location === "/library" ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">Library</span>
           </Link>
-          <Link href="/profile">
-            <a className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/profile" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
-              <User size={22} strokeWidth={location === "/profile" ? 2.5 : 2} />
-              <span className="text-[10px] font-medium">Profile</span>
-            </a>
+          <Link href="/profile" className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/profile" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
+            <User size={22} strokeWidth={location === "/profile" ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">Profile</span>
           </Link>
         </nav>
       </div>
