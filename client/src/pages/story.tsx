@@ -5,9 +5,7 @@ import { X, MoreHorizontal, Heart, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 import storyImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
-import { useSwipeable } from 'react-swipeable'; // Note: react-swipeable is not installed, so I'll implement custom touch handlers
 
-// Mock Data matching home page
 const STORIES_LIST = [
   { id: "1", name: "My Story", img: avatarImg, content: storyImg, time: "2h" },
   { id: "2", name: "Alex Hormozi", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1552581234-26160f608093?w=800&q=80", time: "5h" },
@@ -16,33 +14,33 @@ const STORIES_LIST = [
   { id: "5", name: "Daily Stoic", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80", time: "30m" },
 ];
 
+const getLikedAccounts = (): Set<string> => {
+  try {
+    const stored = localStorage.getItem('likedStoryAccounts');
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  } catch {
+    return new Set();
+  }
+};
+
+const saveLikedAccounts = (accounts: Set<string>) => {
+  localStorage.setItem('likedStoryAccounts', JSON.stringify(Array.from(accounts)));
+};
+
 export default function StoryPage() {
   const [match, params] = useRoute("/story/:id");
   const [_, setLocation] = useLocation();
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [likedAccounts, setLikedAccounts] = useState<Set<string>>(() => getLikedAccounts());
   const [lastTapTime, setLastTapTime] = useState(0);
+  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
 
   const storyId = params?.id || "1";
   const currentIndex = STORIES_LIST.findIndex(s => s.id === storyId);
   const story = STORIES_LIST[currentIndex !== -1 ? currentIndex : 0];
-
-  useEffect(() => {
-    if (isPaused) return;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          handleNext();
-          return 0; // Reset for next or just to keep it clean before unmount
-        }
-        return prev + 1; // 5 seconds roughly
-      });
-    }, 50);
-
-    return () => clearInterval(timer);
-  }, [storyId, isPaused]); // Reset timer when story changes
+  
+  const isCurrentAccountLiked = likedAccounts.has(story.id);
 
   const handleNext = () => {
     if (currentIndex < STORIES_LIST.length - 1) {
@@ -58,56 +56,79 @@ export default function StoryPage() {
       setProgress(0);
       setLocation(`/story/${STORIES_LIST[currentIndex - 1].id}`);
     } else {
-      // If first story, maybe restart or do nothing? Let's restart
       setProgress(0);
     }
   };
+
+  useEffect(() => {
+    if (isPaused) return;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          handleNext();
+          return 0;
+        }
+        return prev + 1;
+      });
+    }, 50);
+
+    return () => clearInterval(timer);
+  }, [storyId, isPaused, currentIndex]);
 
   const handleClose = () => {
     setLocation("/");
   };
 
-  // Touch handlers for swipe
+  const toggleLike = () => {
+    const newLikedAccounts = new Set(likedAccounts);
+    if (newLikedAccounts.has(story.id)) {
+      newLikedAccounts.delete(story.id);
+    } else {
+      newLikedAccounts.add(story.id);
+      setShowHeartAnimation(true);
+      setTimeout(() => setShowHeartAnimation(false), 800);
+    }
+    setLikedAccounts(newLikedAccounts);
+    saveLikedAccounts(newLikedAccounts);
+  };
+
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
-    setIsPaused(true); // Pause on hold (start of touch)
+    setIsPaused(true);
   };
 
   const onTouchEnd = (e: React.TouchEvent) => {
-    setIsPaused(false); // Resume on release
+    setIsPaused(false);
     const touchEndX = e.changedTouches[0].clientX;
     const touchEndY = e.changedTouches[0].clientY;
     
     const diffX = touchStartX.current - touchEndX;
     const diffY = touchStartY.current - touchEndY;
 
-    // Detect horizontal swipe
     if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
       if (diffX > 0) {
-        handleNext(); // Swipe Left -> Next
+        handleNext();
       } else {
-        handlePrev(); // Swipe Right -> Prev
+        handlePrev();
       }
     }
   };
 
-  // Double tap handler
-  const handleTap = (e: React.MouseEvent) => {
+  const handleZoneTap = (isRightZone: boolean) => {
     const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTapTime;
-    
-    if (tapLength < 300 && tapLength > 0) {
-      setIsLiked(!isLiked);
-      e.preventDefault();
+    if (currentTime - lastTapTime < 300) {
+      toggleLike();
     } else {
-      // Single tap logic (left/right zones) is handled by the zones below
-      // But since those zones are on top, this might not be reached directly
-      // We'll let the zones handle navigation and this wrapper handle double tap visualization if needed?
-      // Actually, let's put the double tap logic on the zones.
+      if (isRightZone) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
     }
     setLastTapTime(currentTime);
   };
@@ -120,7 +141,6 @@ export default function StoryPage() {
         onTouchEnd={onTouchEnd}
       >
         
-        {/* Story Content */}
         <div className="absolute inset-0 z-0">
           <img 
             src={story.content} 
@@ -130,7 +150,6 @@ export default function StoryPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
         </div>
 
-        {/* Header */}
         <div className="absolute top-4 left-0 right-0 z-20 p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Avatar className="w-8 h-8 border border-white/20">
@@ -144,53 +163,40 @@ export default function StoryPage() {
           </div>
           
           <div className="flex items-center gap-4">
-            <button className="text-white/80 hover:text-white">
+            <button className="text-white/80 hover:text-white" data-testid="button-story-more">
               <MoreHorizontal size={24} />
             </button>
-            <button onClick={handleClose} className="text-white/80 hover:text-white">
+            <button onClick={handleClose} className="text-white/80 hover:text-white" data-testid="button-story-close">
               <X size={28} />
             </button>
           </div>
         </div>
 
-        {/* Interaction Zones for Tap Navigation & Double Tap Like */}
         <div className="absolute inset-0 z-10 flex">
           <div 
             className="w-1/3 h-full" 
-            onClick={(e) => {
-               const currentTime = new Date().getTime();
-               if (currentTime - lastTapTime < 300) {
-                 setIsLiked(!isLiked);
-               } else {
-                 handlePrev();
-               }
-               setLastTapTime(currentTime);
-            }} 
+            onClick={() => handleZoneTap(false)}
+            data-testid="zone-story-prev"
           /> 
           <div 
             className="w-2/3 h-full" 
-            onClick={(e) => {
-               const currentTime = new Date().getTime();
-               if (currentTime - lastTapTime < 300) {
-                 setIsLiked(!isLiked);
-               } else {
-                 handleNext();
-               }
-               setLastTapTime(currentTime);
-            }} 
+            onClick={() => handleZoneTap(true)}
+            data-testid="zone-story-next"
           /> 
         </div>
 
-        {/* Liked Heart Indicator */}
-        {isLiked && (
-          <div className="absolute bottom-6 right-4 z-30">
+        {isCurrentAccountLiked && (
+          <button 
+            onClick={toggleLike}
+            className="absolute bottom-6 right-4 z-30 p-2 rounded-full hover:bg-white/10 transition-colors"
+            data-testid="button-story-unlike"
+          >
             <Heart size={24} className="text-red-500 fill-red-500 drop-shadow-md" />
-          </div>
+          </button>
         )}
 
-        {/* Big Heart Animation on Double Tap (Optional visual flair) */}
         <AnimatePresence>
-          {isLiked && (
+          {showHeartAnimation && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1.2 }}

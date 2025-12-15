@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -50,21 +51,53 @@ const FEED_ITEMS = [
 
 export default function HomePage() {
   const [_, setLocation] = useLocation();
+  const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
+  const lastTapTimeRef = useRef<{ [key: number]: number }>({});
 
-  const handlePostClick = () => {
+  const handlePostClick = (postId: number) => {
     setLocation("/reels");
+  };
+
+  const toggleLike = (postId: number) => {
+    setLikedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleDoubleClick = (postId: number) => {
+    if (!likedPosts.has(postId)) {
+      toggleLike(postId);
+    }
+  };
+
+  const handleCardTap = (e: React.MouseEvent, postId: number) => {
+    const currentTime = new Date().getTime();
+    const lastTap = lastTapTimeRef.current[postId] || 0;
+    
+    if (currentTime - lastTap < 300) {
+      e.preventDefault();
+      handleDoubleClick(postId);
+    } else {
+      handlePostClick(postId);
+    }
+    lastTapTimeRef.current[postId] = currentTime;
   };
 
   return (
     <div className="pb-24 pt-4">
-      {/* Header / Status Bar Area */}
       <div className="px-4 pb-4 flex justify-between items-center">
-        <h1 className="font-display text-2xl font-semibold">Bitecast</h1>
+        <h1 className="font-display text-2xl font-semibold" data-testid="text-app-title">Bitecast</h1>
         <div className="flex gap-4 items-center">
-          <Button size="icon" variant="ghost" className="rounded-full w-8 h-8">
+          <Button size="icon" variant="ghost" className="rounded-full w-8 h-8" data-testid="button-messages">
             <MessageSquare size={20} />
           </Button>
-          <Button size="icon" variant="ghost" className="rounded-full w-8 h-8 relative">
+          <Button size="icon" variant="ghost" className="rounded-full w-8 h-8 relative" data-testid="button-notifications">
              <span className="sr-only">Notifications</span>
              <div className="w-2 h-2 bg-red-500 rounded-full absolute top-1 right-1.5" />
              <Bell size={20} />
@@ -72,12 +105,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Stories */}
       <div className="pl-4 pb-6 overflow-x-auto no-scrollbar">
         <div className="flex gap-4">
           {STORIES.map((story) => (
             <Link key={story.id} href={`/story/${story.id}`}>
-              <div className="flex flex-col items-center space-y-1.5 min-w-[70px] cursor-pointer group">
+              <div className="flex flex-col items-center space-y-1.5 min-w-[70px] cursor-pointer group" data-testid={`story-item-${story.id}`}>
                 <div className={`p-[2px] rounded-full bg-gradient-to-tr transition-transform duration-300 group-active:scale-95 ${story.viewed ? 'from-white/20 to-white/10' : 'from-accent to-purple-500'}`}>
                   <div className="p-[2px] bg-background rounded-full">
                     <Avatar className="w-16 h-16 border-none">
@@ -95,80 +127,88 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Feed */}
       <div className="px-4 space-y-6">
-        {FEED_ITEMS.map((item, i) => (
-          <motion.div 
-            key={item.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex flex-col gap-3"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={item.avatar} />
-                  <AvatarFallback>{item.author[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                     <span className="text-sm font-medium leading-none">{item.author}</span>
-                     <button className="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-sm transition-colors text-white font-medium">Follow</button>
+        {FEED_ITEMS.map((item, i) => {
+          const isLiked = likedPosts.has(item.id);
+          
+          return (
+            <motion.div 
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="flex flex-col gap-3"
+              data-testid={`feed-item-${item.id}`}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={item.avatar} />
+                    <AvatarFallback>{item.author[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                       <span className="text-sm font-medium leading-none">{item.author}</span>
+                       <button className="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-sm transition-colors text-white font-medium" data-testid={`button-follow-${item.id}`}>Follow</button>
+                    </div>
                   </div>
                 </div>
               </div>
-              {/* Removed 3 dots */}
-            </div>
 
-            {/* Card Content */}
-            <div 
-              className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden group cursor-pointer"
-              onClick={handlePostClick}
-            >
-              <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div 
+                className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden group cursor-pointer"
+                onClick={(e) => handleCardTap(e, item.id)}
+                data-testid={`card-post-${item.id}`}
+              >
+                <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                    <Play fill="white" className="text-white ml-1" />
+                  </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 w-full p-4 space-y-1">
+                  <div className="flex items-center gap-2 mb-2">
+                  </div>
+                  <h3 className="text-lg font-display font-medium text-white leading-tight pr-4">
+                    {item.title}
+                  </h3>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between px-1">
+                <div className="flex gap-4">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-auto w-auto p-0 hover:bg-transparent gap-1.5"
+                    onClick={() => toggleLike(item.id)}
+                    data-testid={`button-like-${item.id}`}
+                  >
+                    <Heart 
+                      className={`w-6 h-6 transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-white'}`} 
+                    />
+                    <span className="text-xs font-medium text-muted-foreground">{item.likes}</span>
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white gap-1.5" data-testid={`button-comment-${item.id}`}>
+                    <MessageCircle className="w-6 h-6" />
+                    <span className="text-xs font-medium text-muted-foreground">428</span>
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white" data-testid={`button-share-${item.id}`}>
+                    <Share2 className="w-6 h-6" />
+                  </Button>
+                </div>
+                <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white" data-testid={`button-bookmark-${item.id}`}>
+                  <Bookmark className="w-6 h-6" />
+                </Button>
+              </div>
               
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-                  <Play fill="white" className="text-white ml-1" />
-                </div>
-              </div>
-
-              <div className="absolute bottom-0 left-0 w-full p-4 space-y-1">
-                <div className="flex items-center gap-2 mb-2">
-                  {/* Removed Podcast Clip & Duration */}
-                </div>
-                <h3 className="text-lg font-display font-medium text-white leading-tight pr-4">
-                  {item.title}
-                </h3>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-between px-1">
-              <div className="flex gap-4">
-                <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white gap-1.5">
-                  <Heart className="w-6 h-6" />
-                  <span className="text-xs font-medium text-muted-foreground">{item.likes}</span>
-                </Button>
-                <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white gap-1.5">
-                  <MessageCircle className="w-6 h-6" />
-                  <span className="text-xs font-medium text-muted-foreground">428</span>
-                </Button>
-                <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white">
-                  <Share2 className="w-6 h-6" />
-                </Button>
-              </div>
-              <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white">
-                <Bookmark className="w-6 h-6" />
-              </Button>
-            </div>
-            
-            <div className="h-px bg-border/50 w-full mt-2" />
-          </motion.div>
-        ))}
+              <div className="h-px bg-border/50 w-full mt-2" />
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
