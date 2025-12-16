@@ -15,8 +15,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground font-sans flex justify-center bg-neutral-950">
-      <div className="w-full max-w-md h-[100dvh] bg-background relative flex flex-col shadow-2xl overflow-hidden noise-bg">
+    <div className="min-h-screen w-full text-foreground font-sans flex justify-center bg-black">
+      <div className="w-full max-w-md h-[100dvh] bg-background relative flex flex-col overflow-hidden noise-bg border-0">
         <main className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
           {children}
         </main>

@@ -52,7 +52,7 @@
 
 :root {
   /* Dark Premium Theme by Default */
-  --background: 240 5% 8%; /* Deep Charcoal/Black */
+  --background: 0 0% 0%; /* Pure Black */
   --foreground: 40 10% 94%; /* Warm Off-White */
 
   --card: 240 5% 12%;
@@ -133,8 +133,18 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
+  }
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  html {
+    background-color: black;
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    background-color: black;
   }
 }
