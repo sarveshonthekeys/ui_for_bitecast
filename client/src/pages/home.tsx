@@ -7,6 +7,7 @@ import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 import cardImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "wouter";
+import { CommentsPanel } from "@/components/comments-panel";
 
 const STORIES = [
   { id: 1, name: "My Story", img: avatarImg, viewed: false },
@@ -26,6 +27,7 @@ const FEED_ITEMS = [
     duration: "2:15",
     image: cardImg,
     likes: "12.5k",
+    comments: "428",
   },
   {
     id: 2,
@@ -36,6 +38,7 @@ const FEED_ITEMS = [
     duration: "1:45",
     image: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&q=80",
     likes: "45.2k",
+    comments: "892",
   },
   {
     id: 3,
@@ -46,6 +49,7 @@ const FEED_ITEMS = [
     duration: "3:10",
     image: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=800&q=80",
     likes: "8.9k",
+    comments: "156",
   },
 ];
 
@@ -192,10 +196,12 @@ export default function HomePage() {
                     />
                     <span className="text-xs font-medium text-muted-foreground">{item.likes}</span>
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white gap-1.5" data-testid={`button-comment-${item.id}`}>
-                    <MessageCircle className="w-6 h-6" />
-                    <span className="text-xs font-medium text-muted-foreground">428</span>
-                  </Button>
+                  <CommentsPanel commentCount={item.comments} contentId={`home-${item.id}`}>
+                    <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white gap-1.5" data-testid={`button-comment-${item.id}`}>
+                      <MessageCircle className="w-6 h-6" />
+                      <span className="text-xs font-medium text-muted-foreground">{item.comments}</span>
+                    </Button>
+                  </CommentsPanel>
                   <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white" data-testid={`button-share-${item.id}`}>
                     <Share2 className="w-6 h-6" />
                   </Button>

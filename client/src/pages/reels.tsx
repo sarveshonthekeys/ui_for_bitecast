@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Heart, MessageCircle, Send, MoreVertical, ThumbsDown, ChevronLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,24 +40,44 @@ const REELS = [
   },
 ];
 
+const getLikedReels = (): Set<number> => {
+  try {
+    const stored = localStorage.getItem('likedReels');
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  } catch {
+    return new Set();
+  }
+};
+
+const saveLikedReels = (reels: Set<number>) => {
+  localStorage.setItem('likedReels', JSON.stringify(Array.from(reels)));
+};
+
 export default function ReelsPage() {
   const [_, setLocation] = useLocation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showHashtags, setShowHashtags] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"up" | "down">("up");
+  const [likedReels, setLikedReels] = useState<Set<number>>(() => getLikedReels());
+  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const isScrolling = useRef(false);
+  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const tapCountRef = useRef(0);
+  const heartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const togglePlay = () => setIsPlaying(!isPlaying);
   const toggleHashtags = () => setShowHashtags(!showHashtags);
 
   const currentReel = REELS[currentIndex];
+  const isCurrentReelLiked = likedReels.has(currentReel.id);
 
-  const goToNext = () => {
-    if (isScrolling.current) return;
+  const goToNext = useCallback(() => {
+    if (isScrolling.current || commentsOpen) return;
     if (currentIndex < REELS.length - 1) {
       isScrolling.current = true;
       setSlideDirection("up");
@@ -65,10 +85,10 @@ export default function ReelsPage() {
       setShowHashtags(false);
       setTimeout(() => { isScrolling.current = false; }, 400);
     }
-  };
+  }, [currentIndex, commentsOpen]);
 
-  const goToPrev = () => {
-    if (isScrolling.current) return;
+  const goToPrev = useCallback(() => {
+    if (isScrolling.current || commentsOpen) return;
     if (currentIndex > 0) {
       isScrolling.current = true;
       setSlideDirection("down");
@@ -76,13 +96,54 @@ export default function ReelsPage() {
       setShowHashtags(false);
       setTimeout(() => { isScrolling.current = false; }, 400);
     }
-  };
+  }, [currentIndex, commentsOpen]);
+
+  const showHeart = useCallback(() => {
+    if (heartTimeoutRef.current) {
+      clearTimeout(heartTimeoutRef.current);
+    }
+    setShowHeartAnimation(true);
+    heartTimeoutRef.current = setTimeout(() => {
+      setShowHeartAnimation(false);
+      heartTimeoutRef.current = null;
+    }, 800);
+  }, []);
+
+  const toggleLike = useCallback(() => {
+    const newLikedReels = new Set(likedReels);
+    if (newLikedReels.has(currentReel.id)) {
+      newLikedReels.delete(currentReel.id);
+    } else {
+      newLikedReels.add(currentReel.id);
+      showHeart();
+    }
+    setLikedReels(newLikedReels);
+    saveLikedReels(newLikedReels);
+  }, [likedReels, currentReel.id, showHeart]);
+
+  const handleDoubleTap = useCallback(() => {
+    if (!isCurrentReelLiked) {
+      toggleLike();
+    } else {
+      showHeart();
+    }
+  }, [isCurrentReelLiked, toggleLike, showHeart]);
+
+  useEffect(() => {
+    return () => {
+      if (heartTimeoutRef.current) {
+        clearTimeout(heartTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (commentsOpen) return;
     touchStartY.current = e.touches[0].clientY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    if (commentsOpen) return;
     const touchEndY = e.changedTouches[0].clientY;
     const diffY = touchStartY.current - touchEndY;
 
@@ -96,6 +157,7 @@ export default function ReelsPage() {
   };
 
   const handleWheel = (e: React.WheelEvent) => {
+    if (commentsOpen) return;
     if (e.deltaY > 30) {
       goToNext();
     } else if (e.deltaY < -30) {
@@ -105,6 +167,25 @@ export default function ReelsPage() {
 
   const handleBack = () => {
     setLocation("/");
+  };
+
+  const handleCenterTap = (e: React.MouseEvent) => {
+    if (commentsOpen) return;
+    e.stopPropagation();
+    tapCountRef.current += 1;
+
+    if (tapCountRef.current === 1) {
+      tapTimeoutRef.current = setTimeout(() => {
+        tapCountRef.current = 0;
+        togglePlay();
+      }, 300);
+    } else if (tapCountRef.current === 2) {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+      tapCountRef.current = 0;
+      handleDoubleTap();
+    }
   };
 
   useEffect(() => {
@@ -178,15 +259,36 @@ export default function ReelsPage() {
       </div>
 
       <div 
-        className="absolute inset-0 z-0 flex items-center justify-center cursor-pointer"
-        onClick={togglePlay}
+        className="absolute inset-0 z-5 flex items-center justify-center cursor-pointer"
+        onClick={handleCenterTap}
       >
       </div>
 
+      <AnimatePresence>
+        {showHeartAnimation && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1.2 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none"
+            key="big-heart"
+          >
+            <Heart size={100} className="text-white/80 fill-white/80 drop-shadow-2xl" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="absolute right-4 bottom-28 z-20 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-1">
-          <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-like">
-            <Heart size={28} className="text-white drop-shadow-sm" />
+          <button 
+            className="p-2 rounded-full hover:bg-white/10 transition-colors" 
+            onClick={toggleLike}
+            data-testid="button-reel-like"
+          >
+            <Heart 
+              size={28} 
+              className={isCurrentReelLiked ? "text-red-500 fill-red-500 drop-shadow-sm" : "text-white drop-shadow-sm"} 
+            />
           </button>
           <span className="text-xs font-medium text-white drop-shadow-md">{currentReel.likes}</span>
         </div>
@@ -197,7 +299,11 @@ export default function ReelsPage() {
           </button>
         </div>
 
-        <CommentsPanel commentCount={currentReel.comments}>
+        <CommentsPanel 
+          commentCount={currentReel.comments} 
+          contentId={currentReel.id}
+          onOpenChange={setCommentsOpen}
+        >
           <div className="flex flex-col items-center gap-1">
             <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-comment">
               <MessageCircle size={28} className="text-white drop-shadow-sm" />
