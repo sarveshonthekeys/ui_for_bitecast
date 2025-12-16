@@ -182,7 +182,7 @@ export default function ReelsPage() {
       >
       </div>
 
-      <div className="absolute right-4 bottom-40 z-20 flex flex-col items-center gap-6">
+      <div className="absolute right-4 bottom-32 z-20 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-1">
           <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-like">
             <Heart size={28} className="text-white drop-shadow-sm" />
@@ -216,7 +216,7 @@ export default function ReelsPage() {
         </button>
       </div>
 
-      <div className="absolute left-0 bottom-14 z-10 p-4 pr-20 w-full text-white">
+      <div className="absolute left-0 bottom-6 z-10 p-4 pr-20 w-full text-white">
         <div className="flex items-center gap-3 mb-3">
           <Avatar className="w-10 h-10 border-2 border-white">
             <AvatarImage src={currentReel.avatar} />
