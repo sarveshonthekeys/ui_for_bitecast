@@ -207,7 +207,7 @@ export default function StoryPage() {
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseLeave}
       >
-        <AnimatePresence mode="wait" custom={slideDirection}>
+        <AnimatePresence initial={false} custom={slideDirection}>
           <motion.div
             key={story.id}
             custom={slideDirection}
@@ -215,7 +215,7 @@ export default function StoryPage() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
+            transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
             className="absolute inset-0 z-0"
           >
             <img 
