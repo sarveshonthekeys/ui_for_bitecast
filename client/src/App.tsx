@@ -10,7 +10,8 @@ import ExplorePage from "@/pages/explore";
 import ReelsPage from "@/pages/reels";
 import LibraryPage from "@/pages/library";
 import ProfilePage from "@/pages/profile";
-
+import MessagesPage from "@/pages/messages";
+import NotificationsPage from "@/pages/notifications";
 import StoryPage from "@/pages/story";
 
 function Router() {
@@ -24,6 +25,8 @@ function Router() {
         <Route path="/library" component={LibraryPage} />
         <Route path="/profile" component={ProfilePage} />
         <Route path="/story/:id" component={StoryPage} />
+        <Route path="/messages" component={MessagesPage} />
+        <Route path="/notifications" component={NotificationsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

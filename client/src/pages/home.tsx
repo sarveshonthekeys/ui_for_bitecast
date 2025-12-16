@@ -98,14 +98,18 @@ export default function HomePage() {
       <div className="px-4 pb-4 flex justify-between items-center">
         <h1 className="font-display text-2xl font-semibold" data-testid="text-app-title">Bitecast</h1>
         <div className="flex gap-4 items-center">
-          <Button size="icon" variant="ghost" className="rounded-full w-8 h-8" data-testid="button-messages">
-            <MessageSquare size={20} />
-          </Button>
-          <Button size="icon" variant="ghost" className="rounded-full w-8 h-8 relative" data-testid="button-notifications">
-             <span className="sr-only">Notifications</span>
-             <div className="w-2 h-2 bg-red-500 rounded-full absolute top-1 right-1.5" />
-             <Bell size={20} />
-          </Button>
+          <Link href="/messages">
+            <Button size="icon" variant="ghost" className="rounded-full" data-testid="button-messages">
+              <MessageSquare size={20} />
+            </Button>
+          </Link>
+          <Link href="/notifications">
+            <Button size="icon" variant="ghost" className="rounded-full relative" data-testid="button-notifications">
+               <span className="sr-only">Notifications</span>
+               <div className="w-2 h-2 bg-red-500 rounded-full absolute top-1 right-1.5" />
+               <Bell size={20} />
+            </Button>
+          </Link>
         </div>
       </div>
 
