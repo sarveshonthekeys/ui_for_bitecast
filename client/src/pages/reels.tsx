@@ -44,9 +44,11 @@ export default function ReelsPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showHashtags, setShowHashtags] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<"up" | "down">("up");
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const isScrolling = useRef(false);
 
   const togglePlay = () => setIsPlaying(!isPlaying);
   const toggleHashtags = () => setShowHashtags(!showHashtags);
@@ -54,16 +56,24 @@ export default function ReelsPage() {
   const currentReel = REELS[currentIndex];
 
   const goToNext = () => {
+    if (isScrolling.current) return;
     if (currentIndex < REELS.length - 1) {
+      isScrolling.current = true;
+      setSlideDirection("up");
       setCurrentIndex(currentIndex + 1);
       setShowHashtags(false);
+      setTimeout(() => { isScrolling.current = false; }, 400);
     }
   };
 
   const goToPrev = () => {
+    if (isScrolling.current) return;
     if (currentIndex > 0) {
+      isScrolling.current = true;
+      setSlideDirection("down");
       setCurrentIndex(currentIndex - 1);
       setShowHashtags(false);
+      setTimeout(() => { isScrolling.current = false; }, 400);
     }
   };
 
@@ -109,6 +119,21 @@ export default function ReelsPage() {
     });
   }, [currentIndex, isPlaying]);
 
+  const slideVariants = {
+    enter: (direction: "up" | "down") => ({
+      y: direction === "up" ? "100%" : "-100%",
+      opacity: 0.8,
+    }),
+    center: {
+      y: 0,
+      opacity: 1,
+    },
+    exit: (direction: "up" | "down") => ({
+      y: direction === "up" ? "-100%" : "100%",
+      opacity: 0.8,
+    }),
+  };
+
   return (
     <div 
       ref={containerRef}
@@ -117,13 +142,15 @@ export default function ReelsPage() {
       onTouchEnd={handleTouchEnd}
       onWheel={handleWheel}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={slideDirection}>
         <motion.div
           key={currentReel.id}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
-          transition={{ duration: 0.3 }}
+          custom={slideDirection}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ type: "tween", duration: 0.35, ease: "easeInOut" }}
           className="absolute inset-0 z-0 bg-neutral-900"
         >
           <video 
@@ -139,7 +166,7 @@ export default function ReelsPage() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="absolute top-0 left-0 right-0 z-10 p-4 pt-6 flex justify-between items-center text-white">
+      <div className="absolute top-0 left-0 right-0 z-10 p-4 pt-8 flex justify-between items-center text-white">
         <button 
           onClick={handleBack}
           className="p-2 rounded-full hover:bg-white/10 transition-colors"
@@ -155,7 +182,7 @@ export default function ReelsPage() {
       >
       </div>
 
-      <div className="absolute right-4 bottom-36 z-20 flex flex-col items-center gap-6">
+      <div className="absolute right-4 bottom-48 z-20 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-1">
           <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-like">
             <Heart size={28} className="text-white drop-shadow-sm" />
@@ -189,8 +216,8 @@ export default function ReelsPage() {
         </button>
       </div>
 
-      <div className="absolute left-0 bottom-10 z-10 p-4 pr-20 w-full text-white">
-        <div className="flex items-center gap-3 mb-2">
+      <div className="absolute left-0 bottom-20 z-10 p-4 pr-20 w-full text-white">
+        <div className="flex items-center gap-3 mb-3">
           <Avatar className="w-10 h-10 border-2 border-white">
             <AvatarImage src={currentReel.avatar} />
             <AvatarFallback>AU</AvatarFallback>

@@ -1,5 +1,5 @@
 import { useLocation, useRoute } from "wouter";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { X, MoreHorizontal, Heart, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,8 +33,8 @@ export default function StoryPage() {
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [likedAccounts, setLikedAccounts] = useState<Set<string>>(() => getLikedAccounts());
-  const [lastTapTime, setLastTapTime] = useState(0);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("left");
 
   const storyId = params?.id || "1";
   const currentIndex = STORIES_LIST.findIndex(s => s.id === storyId);
@@ -42,23 +42,30 @@ export default function StoryPage() {
   
   const isCurrentAccountLiked = likedAccounts.has(story.id);
 
-  const handleNext = () => {
+  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const tapCountRef = useRef(0);
+  const isHoldingRef = useRef(false);
+  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleNext = useCallback(() => {
     if (currentIndex < STORIES_LIST.length - 1) {
+      setSlideDirection("left");
       setProgress(0);
       setLocation(`/story/${STORIES_LIST[currentIndex + 1].id}`);
     } else {
       setLocation("/");
     }
-  };
+  }, [currentIndex, setLocation]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (currentIndex > 0) {
+      setSlideDirection("right");
       setProgress(0);
       setLocation(`/story/${STORIES_LIST[currentIndex - 1].id}`);
     } else {
       setProgress(0);
     }
-  };
+  }, [currentIndex, setLocation]);
 
   useEffect(() => {
     if (isPaused) return;
@@ -74,13 +81,13 @@ export default function StoryPage() {
     }, 50);
 
     return () => clearInterval(timer);
-  }, [storyId, isPaused, currentIndex]);
+  }, [storyId, isPaused, handleNext]);
 
   const handleClose = () => {
     setLocation("/");
   };
 
-  const toggleLike = () => {
+  const toggleLike = useCallback(() => {
     const newLikedAccounts = new Set(likedAccounts);
     if (newLikedAccounts.has(story.id)) {
       newLikedAccounts.delete(story.id);
@@ -91,19 +98,36 @@ export default function StoryPage() {
     }
     setLikedAccounts(newLikedAccounts);
     saveLikedAccounts(newLikedAccounts);
-  };
+  }, [likedAccounts, story.id]);
 
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
 
+  const handleHoldStart = () => {
+    isHoldingRef.current = true;
+    holdTimeoutRef.current = setTimeout(() => {
+      if (isHoldingRef.current) {
+        setIsPaused(true);
+      }
+    }, 150);
+  };
+
+  const handleHoldEnd = () => {
+    isHoldingRef.current = false;
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+    }
+    setIsPaused(false);
+  };
+
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
-    setIsPaused(true);
+    handleHoldStart();
   };
 
   const onTouchEnd = (e: React.TouchEvent) => {
-    setIsPaused(false);
+    handleHoldEnd();
     const touchEndX = e.changedTouches[0].clientX;
     const touchEndY = e.changedTouches[0].clientY;
     
@@ -119,18 +143,58 @@ export default function StoryPage() {
     }
   };
 
-  const handleZoneTap = (isRightZone: boolean) => {
-    const currentTime = new Date().getTime();
-    if (currentTime - lastTapTime < 300) {
-      toggleLike();
-    } else {
-      if (isRightZone) {
-        handleNext();
-      } else {
-        handlePrev();
+  const onMouseDown = () => {
+    handleHoldStart();
+  };
+
+  const onMouseUp = () => {
+    handleHoldEnd();
+  };
+
+  const onMouseLeave = () => {
+    handleHoldEnd();
+  };
+
+  const handleCenterDoubleTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    tapCountRef.current += 1;
+
+    if (tapCountRef.current === 1) {
+      tapTimeoutRef.current = setTimeout(() => {
+        tapCountRef.current = 0;
+      }, 300);
+    } else if (tapCountRef.current === 2) {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
       }
+      tapCountRef.current = 0;
+      toggleLike();
     }
-    setLastTapTime(currentTime);
+  };
+
+  const handleLeftZoneTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handlePrev();
+  };
+
+  const handleRightZoneTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleNext();
+  };
+
+  const slideVariants = {
+    enter: (direction: "left" | "right") => ({
+      x: direction === "left" ? "100%" : "-100%",
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: "left" | "right") => ({
+      x: direction === "left" ? "-100%" : "100%",
+      opacity: 0,
+    }),
   };
 
   return (
@@ -139,16 +203,29 @@ export default function StoryPage() {
         className="relative w-full h-full max-w-md bg-neutral-900 overflow-hidden"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseLeave}
       >
-        
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={story.content} 
-            alt="Story" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
-        </div>
+        <AnimatePresence mode="wait" custom={slideDirection}>
+          <motion.div
+            key={story.id}
+            custom={slideDirection}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
+            className="absolute inset-0 z-0"
+          >
+            <img 
+              src={story.content} 
+              alt="Story" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
+          </motion.div>
+        </AnimatePresence>
 
         <div className="absolute top-4 left-0 right-0 z-20 p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -174,13 +251,18 @@ export default function StoryPage() {
 
         <div className="absolute inset-0 z-10 flex">
           <div 
-            className="w-1/3 h-full" 
-            onClick={() => handleZoneTap(false)}
+            className="w-1/4 h-full" 
+            onClick={handleLeftZoneTap}
             data-testid="zone-story-prev"
           /> 
           <div 
-            className="w-2/3 h-full" 
-            onClick={() => handleZoneTap(true)}
+            className="w-1/2 h-full" 
+            onClick={handleCenterDoubleTap}
+            data-testid="zone-story-center"
+          /> 
+          <div 
+            className="w-1/4 h-full" 
+            onClick={handleRightZoneTap}
             data-testid="zone-story-next"
           /> 
         </div>
