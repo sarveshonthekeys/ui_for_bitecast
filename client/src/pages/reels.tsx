@@ -209,7 +209,7 @@ export default function ReelsPage() {
       </div>
 
       <button 
-        className="absolute right-4 bottom-2 z-20 p-2 rounded-full hover:bg-white/10 transition-colors"
+        className="absolute right-4 bottom-6 z-20 p-2 rounded-full hover:bg-white/10 transition-colors"
         onClick={toggleHashtags}
         data-testid="button-reel-more"
       >
