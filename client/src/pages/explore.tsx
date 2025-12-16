@@ -3,6 +3,7 @@ import { Search, SlidersHorizontal, ArrowUpRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { useLocation } from "wouter";
 import discoverImg from "@assets/generated_images/abstract_discovery_card_art.png";
 import textureImg from "@assets/generated_images/dark_abstract_gradient_texture.png";
 
@@ -26,6 +27,11 @@ const EXPLORE_FEED = [
 
 export default function ExplorePage() {
   const [activeCat, setActiveCat] = useState("All");
+  const [_, setLocation] = useLocation();
+
+  const handleItemClick = () => {
+    setLocation("/reels?from=explore");
+  };
 
   return (
     <div className="pb-24 pt-4 px-4 space-y-6">
@@ -65,6 +71,8 @@ export default function ExplorePage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.05 }}
             className={`aspect-square rounded-2xl relative overflow-hidden group cursor-pointer ${card.color}`}
+            onClick={handleItemClick}
+            data-testid={`discover-card-${card.id}`}
           >
             {card.img && <img src={card.img} className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition-transform duration-500 group-hover:scale-110" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -94,6 +102,8 @@ export default function ExplorePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + (i * 0.05) }}
               className="group cursor-pointer"
+              onClick={handleItemClick}
+              data-testid={`explore-feed-item-${item.id}`}
             >
               {/* More spacious card layout */}
               <div className="flex gap-5 items-start">

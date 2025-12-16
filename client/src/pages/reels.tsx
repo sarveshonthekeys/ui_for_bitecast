@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Heart, MessageCircle, Send, MoreVertical, ThumbsDown, ChevronLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
 import reelThumb from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { CommentsPanel } from "@/components/comments-panel";
 
 const REELS = [
@@ -55,6 +55,11 @@ const saveLikedReels = (reels: Set<number>) => {
 
 export default function ReelsPage() {
   const [_, setLocation] = useLocation();
+  const searchString = useSearch();
+  const fromExplore = useMemo(() => {
+    const params = new URLSearchParams(searchString);
+    return params.get("from") === "explore";
+  }, [searchString]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showHashtags, setShowHashtags] = useState(false);
@@ -166,7 +171,11 @@ export default function ReelsPage() {
   };
 
   const handleBack = () => {
-    setLocation("/");
+    if (fromExplore) {
+      setLocation("/explore");
+    } else {
+      setLocation("/");
+    }
   };
 
   const handleCenterTap = (e: React.MouseEvent) => {
