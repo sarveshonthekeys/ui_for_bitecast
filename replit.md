@@ -13,13 +13,14 @@ Bitecast is a React-based social media application featuring:
 
 ## Recent Changes
 
-- **Dec 16, 2025**: Added CommentsPanel component to reels page
-  - Slides up from bottom with smooth vaul-based animations
-  - Supports snap points at 50%, 75%, and 100% screen height
-  - Dark theme with rounded top corners
-  - Scrollable comment list with profile pics, usernames, timestamps, and likes
-  - Fixed comment input at bottom with send button
-  - Gesture-based swipe up/down to expand/collapse
+- **Dec 16, 2025**: Enhanced CommentsPanel and reel interactions
+  - Each reel/post has unique comments (hash-based generation from contentId)
+  - Fixed overlay dismiss - touch events only blocked on scroll area
+  - Added heart animation timeout cleanup to prevent memory leaks
+  - Added double-tap to like with heart animation (matching stories)
+  - Like state persists in localStorage per reel
+  - Integrated comments panel into home page feed items
+  - Accessibility improvements (VisuallyHidden title for screen readers)
 
 ## Project Architecture
 
