@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import reelThumb from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { CommentsPanel } from "@/components/comments-panel";
 
 const REELS = [
   {
@@ -196,12 +197,14 @@ export default function ReelsPage() {
           </button>
         </div>
 
-        <div className="flex flex-col items-center gap-1">
-          <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-comment">
-            <MessageCircle size={28} className="text-white drop-shadow-sm" />
-          </button>
-          <span className="text-xs font-medium text-white drop-shadow-md">{currentReel.comments}</span>
-        </div>
+        <CommentsPanel commentCount={currentReel.comments}>
+          <div className="flex flex-col items-center gap-1">
+            <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-comment">
+              <MessageCircle size={28} className="text-white drop-shadow-sm" />
+            </button>
+            <span className="text-xs font-medium text-white drop-shadow-md">{currentReel.comments}</span>
+          </div>
+        </CommentsPanel>
 
         <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-share">
           <Send size={28} className="text-white drop-shadow-sm -rotate-45" />
