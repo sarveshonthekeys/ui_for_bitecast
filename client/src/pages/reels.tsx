@@ -182,7 +182,7 @@ export default function ReelsPage() {
       >
       </div>
 
-      <div className="absolute right-4 bottom-32 z-20 flex flex-col items-center gap-6">
+      <div className="absolute right-4 bottom-28 z-20 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-1">
           <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-like">
             <Heart size={28} className="text-white drop-shadow-sm" />
@@ -206,26 +206,26 @@ export default function ReelsPage() {
         <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-share">
           <Send size={28} className="text-white drop-shadow-sm -rotate-45" />
         </button>
-
-        <button 
-          className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          onClick={toggleHashtags}
-          data-testid="button-reel-more"
-        >
-          <MoreVertical size={24} className="text-white drop-shadow-sm" />
-        </button>
       </div>
 
-      <div className="absolute left-0 bottom-6 z-10 p-4 pr-20 w-full text-white">
+      <button 
+        className="absolute right-4 bottom-2 z-20 p-2 rounded-full hover:bg-white/10 transition-colors"
+        onClick={toggleHashtags}
+        data-testid="button-reel-more"
+      >
+        <MoreVertical size={24} className="text-white drop-shadow-sm" />
+      </button>
+
+      <div className="absolute left-0 bottom-2 z-10 p-4 pr-20 w-full text-white">
         <div className="flex items-center gap-3 mb-3">
-          <Avatar className="w-10 h-10 border-2 border-white">
+          <Avatar className="w-12 h-12 border-2 border-white">
             <AvatarImage src={currentReel.avatar} />
             <AvatarFallback>AU</AvatarFallback>
           </Avatar>
-          <span className="font-semibold text-sm drop-shadow-md" data-testid="text-reel-author">{currentReel.author}</span>
-          <button className="px-2 py-0.5 rounded-md border border-white/30 text-[10px] font-medium backdrop-blur-sm" data-testid="button-reel-follow">Follow</button>
+          <span className="font-semibold text-base drop-shadow-md" data-testid="text-reel-author">{currentReel.author}</span>
+          <button className="px-3 py-1 rounded-md border border-white/30 text-xs font-medium backdrop-blur-sm" data-testid="button-reel-follow">Follow</button>
         </div>
-        <p className="text-sm opacity-90 leading-relaxed drop-shadow-md" data-testid="text-reel-title">
+        <p className="text-base opacity-90 leading-relaxed drop-shadow-md" data-testid="text-reel-title">
           {currentReel.title}
         </p>
         
