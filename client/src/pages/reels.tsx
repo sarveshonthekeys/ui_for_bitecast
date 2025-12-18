@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { Heart, MessageCircle, Send, MoreVertical, ThumbsDown, ChevronLeft } from "lucide-react";
+import { Heart, MessageCircle, Send, MoreVertical, ThumbsDown, ChevronLeft, Volume2, VolumeX } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
 import reelThumb from "@assets/generated_images/moody_nature_reel_thumbnail.png";
@@ -62,6 +62,7 @@ export default function ReelsPage() {
   }, [searchString]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
   const [showHashtags, setShowHashtags] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"up" | "down">("up");
   const [likedReels, setLikedReels] = useState<Set<number>>(() => getLikedReels());
@@ -77,6 +78,7 @@ export default function ReelsPage() {
 
   const togglePlay = () => setIsPlaying(!isPlaying);
   const toggleHashtags = () => setShowHashtags(!showHashtags);
+  const toggleMute = () => setIsMuted(!isMuted);
 
   const currentReel = REELS[currentIndex];
   const isCurrentReelLiked = likedReels.has(currentReel.id);
@@ -250,7 +252,7 @@ export default function ReelsPage() {
             className="w-full h-full object-cover opacity-90"
             autoPlay
             loop
-            muted={false}
+            muted={isMuted}
             playsInline
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
@@ -264,6 +266,17 @@ export default function ReelsPage() {
           data-testid="button-reels-back"
         >
           <ChevronLeft size={28} className="text-white drop-shadow-md" />
+        </button>
+        <button 
+          onClick={toggleMute}
+          className="p-2 rounded-full hover:bg-white/10 transition-colors"
+          data-testid="button-reels-mute"
+        >
+          {isMuted ? (
+            <VolumeX size={24} className="text-white drop-shadow-md" />
+          ) : (
+            <Volume2 size={24} className="text-white drop-shadow-md" />
+          )}
         </button>
       </div>
 

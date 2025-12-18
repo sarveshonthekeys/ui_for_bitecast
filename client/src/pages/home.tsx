@@ -57,6 +57,7 @@ export default function HomePage() {
   const [_, setLocation] = useLocation();
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
   const lastTapTimeRef = useRef<{ [key: number]: number }>({});
+  const clickTimeoutRef = useRef<{ [key: number]: number }>({});
 
   const handlePostClick = (postId: number) => {
     setLocation("/reels");
@@ -80,15 +81,28 @@ export default function HomePage() {
     }
   };
 
+  const clearClickTimeout = (postId: number) => {
+    if (clickTimeoutRef.current[postId]) {
+      clearTimeout(clickTimeoutRef.current[postId]);
+      delete clickTimeoutRef.current[postId];
+    }
+  };
+
   const handleCardTap = (e: React.MouseEvent, postId: number) => {
     const currentTime = new Date().getTime();
     const lastTap = lastTapTimeRef.current[postId] || 0;
     
     if (currentTime - lastTap < 300) {
+      // Double click detected
       e.preventDefault();
+      clearClickTimeout(postId);
       handleDoubleClick(postId);
     } else {
-      handlePostClick(postId);
+      // Single click - wait before navigating
+      clickTimeoutRef.current[postId] = setTimeout(() => {
+        handlePostClick(postId);
+        delete clickTimeoutRef.current[postId];
+      }, 300) as unknown as number;
     }
     lastTapTimeRef.current[postId] = currentTime;
   };

@@ -225,7 +225,7 @@ export default function ExplorePage() {
             onClick={() => setLocation("/reels?from=explore")}
             data-testid={`discover-card-${card.id}`}
           >
-            {card.img && <img src={card.img} className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition-transform duration-500 group-hover:scale-110" />}
+            {card.img && <img src={card.img} alt={`${card.title} background`} className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition-transform duration-500 group-hover:scale-110" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
             <div className="absolute bottom-0 left-0 p-4 w-full">
               <span className="text-[10px] uppercase tracking-wider text-white/60 font-medium mb-1 block">{card.subtitle}</span>

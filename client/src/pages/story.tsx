@@ -100,6 +100,11 @@ export default function StoryPage() {
     saveLikedAccounts(newLikedAccounts);
   }, [likedAccounts, story.id]);
 
+  const handleSend = useCallback(() => {
+    // TODO: Implement share/send story functionality
+    console.log('Send story:', story.id);
+  }, [story.id]);
+
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
 
@@ -227,7 +232,21 @@ export default function StoryPage() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute top-4 left-0 right-0 z-20 p-4 flex justify-between items-center">
+        {/* Progress Bars */}
+        <div className="absolute top-2 left-0 right-0 z-20 px-2 flex gap-1">
+          {STORIES_LIST.map((s, i) => (
+            <div key={s.id} className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-white rounded-full transition-all duration-100"
+                style={{ 
+                  width: i < currentIndex ? '100%' : i === currentIndex ? `${progress}%` : '0%' 
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="absolute top-6 left-0 right-0 z-20 p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Avatar className="w-8 h-8 border border-white/20">
               <AvatarImage src={story.img} />
@@ -267,15 +286,29 @@ export default function StoryPage() {
           /> 
         </div>
 
-        {isCurrentAccountLiked && (
+        {/* Like and Send Buttons */}
+        <div className="absolute bottom-6 right-4 z-30 flex flex-col gap-4">
           <button 
             onClick={toggleLike}
-            className="absolute bottom-6 right-4 z-30 p-2 rounded-full hover:bg-white/10 transition-colors"
-            data-testid="button-story-unlike"
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            data-testid={isCurrentAccountLiked ? "button-story-unlike" : "button-story-like"}
           >
-            <Heart size={24} className="text-red-500 fill-red-500 drop-shadow-md" />
+            <Heart 
+              size={24} 
+              className={isCurrentAccountLiked 
+                ? "text-red-500 fill-red-500 drop-shadow-md" 
+                : "text-white drop-shadow-md"
+              } 
+            />
           </button>
-        )}
+          <button 
+            onClick={handleSend}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            data-testid="button-story-send"
+          >
+            <Send size={24} className="text-white drop-shadow-md" />
+          </button>
+        </div>
 
         <AnimatePresence>
           {showHeartAnimation && (
