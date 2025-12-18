@@ -100,6 +100,11 @@ export default function StoryPage() {
     saveLikedAccounts(newLikedAccounts);
   }, [likedAccounts, story.id]);
 
+  const handleSend = useCallback(() => {
+    // TODO: Implement share/send story functionality
+    console.log('Send story:', story.id);
+  }, [story.id]);
+
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
 
@@ -297,6 +302,7 @@ export default function StoryPage() {
             />
           </button>
           <button 
+            onClick={handleSend}
             className="p-2 rounded-full hover:bg-white/10 transition-colors"
             data-testid="button-story-send"
           >
