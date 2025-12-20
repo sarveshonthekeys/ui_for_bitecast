@@ -38,75 +38,42 @@ const REEL_THUMBNAILS = [
 
 function ReelCarousel({ onReelClick }: { onReelClick: (id: number) => void }) {
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
-
-  const handleScroll = () => {
-    if (carouselRef.current) {
-      const scrollLeft = carouselRef.current.scrollLeft;
-      const cardWidth = 110;
-      const gap = 12;
-      const newIndex = Math.round(scrollLeft / (cardWidth + gap));
-      setActiveCardIndex(Math.max(0, Math.min(newIndex, REEL_THUMBNAILS.length - 1)));
-    }
-  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-3"
     >
       <div 
         ref={carouselRef}
         className="flex gap-3 overflow-x-auto no-scrollbar py-2 snap-x snap-mandatory"
-        onScroll={handleScroll}
       >
-        {REEL_THUMBNAILS.map((reel, index) => {
-          const isActive = index === activeCardIndex;
-          return (
-            <motion.div
-              key={reel.id}
-              className="shrink-0 snap-start cursor-pointer"
-              style={{ width: 110 }}
-              onClick={() => onReelClick(reel.id)}
-              data-testid={`reel-thumbnail-${reel.id}`}
+        {REEL_THUMBNAILS.map((reel) => (
+          <motion.div
+            key={reel.id}
+            className="shrink-0 snap-start cursor-pointer"
+            style={{ width: 110 }}
+            onClick={() => onReelClick(reel.id)}
+            data-testid={`reel-thumbnail-${reel.id}`}
+          >
+            <div 
+              className="relative overflow-hidden rounded-xl shadow-md shadow-black/30"
+              style={{ aspectRatio: '9/16' }}
             >
-              <div 
-                className={`relative overflow-hidden rounded-xl transition-shadow duration-300 ${
-                  isActive ? 'shadow-lg shadow-black/50' : 'shadow-md shadow-black/30'
-                }`}
-                style={{ aspectRatio: '9/16' }}
-              >
-                <img 
-                  src={reel.img} 
-                  alt={reel.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className={`w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 ${
-                    isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                  }`}>
-                    <Play size={14} className="text-white ml-0.5" fill="white" />
-                  </div>
+              <img 
+                src={reel.img} 
+                alt={reel.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <Play size={14} className="text-white ml-0.5" fill="white" />
                 </div>
               </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      <div className="flex justify-start gap-1">
-        {REEL_THUMBNAILS.map((_, index) => (
-          <div
-            key={index}
-            className={`h-1 rounded-full transition-all duration-300 ${
-              index === activeCardIndex 
-                ? 'w-4 bg-white/60' 
-                : 'w-1 bg-white/20'
-            }`}
-          />
+            </div>
+          </motion.div>
         ))}
       </div>
     </motion.div>
@@ -174,7 +141,7 @@ export default function ExplorePage() {
         ))}
       </div>
 
-      <div className="space-y-8 pt-4">
+      <div className="space-y-6 pt-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Trending for you</h2>
           <span className="text-xs text-accent cursor-pointer" data-testid="link-view-all">View all</span>
@@ -187,13 +154,13 @@ export default function ExplorePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 + (i * 0.05) }}
             data-testid={`explore-feed-item-${item.id}`}
-            className="space-y-4"
+            className="space-y-3"
           >
             <h3 className="font-display font-medium text-lg text-white">{item.title}</h3>
             <ReelCarousel onReelClick={handleReelClick} />
             
             {i < EXPLORE_FEED.length - 1 && (
-              <div className="mt-8 h-px bg-white/5 w-full" />
+              <div className="mt-4 h-px bg-white/5 w-full" />
             )}
           </motion.div>
         ))}
