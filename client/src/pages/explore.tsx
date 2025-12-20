@@ -17,12 +17,12 @@ const DISCOVERY_CARDS = [
 ];
 
 const EXPLORE_FEED = [
-  { id: 1, title: "The Art of Saying No", author: "Greg McKeown", category: "Mindset", img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80" },
-  { id: 2, title: "Sleep Smarter", author: "Shawn Stevenson", category: "Health", img: "https://images.unsplash.com/photo-1511296933631-18b5f0bc0846?w=800&q=80" },
-  { id: 3, title: "Financial Freedom", author: "Morgan Housel", category: "Wealth", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80" },
-  { id: 4, title: "Building Trust", author: "Simon Sinek", category: "Relationships", img: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80" },
-  { id: 5, title: "The Power of Now", author: "Eckhart Tolle", category: "Spirituality", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80" },
-  { id: 6, title: "Atomic Habits", author: "James Clear", category: "Mindset", img: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=800&q=80" },
+  { id: 1, title: "The Art of Saying No" },
+  { id: 2, title: "Sleep Smarter" },
+  { id: 3, title: "Financial Freedom" },
+  { id: 4, title: "Building Trust" },
+  { id: 5, title: "The Power of Now" },
+  { id: 6, title: "Atomic Habits" },
 ];
 
 const REEL_THUMBNAILS = [
@@ -36,14 +36,14 @@ const REEL_THUMBNAILS = [
   { id: 8, img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80", title: "Growth" },
 ];
 
-function ReelCarousel({ itemTitle, onReelClick }: { itemTitle: string; onReelClick: (id: number) => void }) {
+function ReelCarousel({ onReelClick }: { onReelClick: (id: number) => void }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeCardIndex, setActiveCardIndex] = useState(3);
 
   const handleScroll = () => {
     if (carouselRef.current) {
       const scrollLeft = carouselRef.current.scrollLeft;
-      const cardWidth = 100;
+      const cardWidth = 110;
       const gap = 12;
       const containerWidth = carouselRef.current.offsetWidth;
       const centerOffset = containerWidth / 2 - cardWidth / 2;
@@ -54,23 +54,20 @@ function ReelCarousel({ itemTitle, onReelClick }: { itemTitle: string; onReelCli
 
   return (
     <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      className="mt-4 space-y-3"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-3"
     >
-      <p className="text-sm font-medium text-white/70 px-2">{itemTitle} Reels</p>
-      
       <div 
         ref={carouselRef}
-        className="flex gap-3 overflow-x-auto no-scrollbar px-2 py-2 snap-x snap-mandatory"
+        className="flex gap-3 overflow-x-auto no-scrollbar px-0 py-2 snap-x snap-mandatory"
         onScroll={handleScroll}
         style={{ 
-          scrollPaddingLeft: 'calc(50% - 50px)',
-          scrollPaddingRight: 'calc(50% - 50px)',
+          scrollPaddingLeft: 'calc(50% - 55px)',
+          scrollPaddingRight: 'calc(50% - 55px)',
         }}
       >
-        <div className="shrink-0" style={{ width: 'calc(50% - 50px - 6px)' }} />
+        <div className="shrink-0" style={{ width: 'calc(50% - 55px - 6px)' }} />
         
         {REEL_THUMBNAILS.map((reel, index) => {
           const isActive = index === activeCardIndex;
@@ -78,7 +75,7 @@ function ReelCarousel({ itemTitle, onReelClick }: { itemTitle: string; onReelCli
             <motion.div
               key={reel.id}
               className="shrink-0 snap-center cursor-pointer"
-              style={{ width: 100 }}
+              style={{ width: 110 }}
               animate={{
                 scale: isActive ? 1 : 0.85,
                 opacity: isActive ? 1 : 0.6,
@@ -107,23 +104,15 @@ function ReelCarousel({ itemTitle, onReelClick }: { itemTitle: string; onReelCli
                     <Play size={14} className="text-white ml-0.5" fill="white" />
                   </div>
                 </div>
-                
-                <div className="absolute bottom-0 left-0 right-0 p-2">
-                  <p className={`text-xs font-medium text-white text-center drop-shadow-lg transition-opacity duration-300 line-clamp-2 ${
-                    isActive ? 'opacity-100' : 'opacity-70'
-                  }`}>
-                    {reel.title}
-                  </p>
-                </div>
               </div>
             </motion.div>
           );
         })}
         
-        <div className="shrink-0" style={{ width: 'calc(50% - 50px - 6px)' }} />
+        <div className="shrink-0" style={{ width: 'calc(50% - 55px - 6px)' }} />
       </div>
 
-      <div className="flex justify-center gap-1 px-2">
+      <div className="flex justify-center gap-1">
         {REEL_THUMBNAILS.map((_, index) => (
           <div
             key={index}
@@ -141,15 +130,10 @@ function ReelCarousel({ itemTitle, onReelClick }: { itemTitle: string; onReelCli
 
 export default function ExplorePage() {
   const [activeCat, setActiveCat] = useState("All");
-  const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
   const [_, setLocation] = useLocation();
 
   const handleReelClick = (reelId: number) => {
     setLocation(`/reels?from=explore&reelId=${reelId}`);
-  };
-
-  const toggleCarousel = (itemId: number) => {
-    setExpandedItemId(expandedItemId === itemId ? null : itemId);
   };
 
   return (
@@ -205,53 +189,29 @@ export default function ExplorePage() {
         ))}
       </div>
 
-      <div className="space-y-6 pt-4">
+      <div className="space-y-8 pt-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Trending for you</h2>
           <span className="text-xs text-accent cursor-pointer" data-testid="link-view-all">View all</span>
         </div>
         
-        <div className="grid grid-cols-1 gap-6">
-          {EXPLORE_FEED.map((item, i) => (
-            <motion.div 
-              key={item.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + (i * 0.05) }}
-              data-testid={`explore-feed-item-${item.id}`}
-            >
-              <div 
-                className="group cursor-pointer"
-                onClick={() => toggleCarousel(item.id)}
-              >
-                <div className="flex gap-5 items-start">
-                   <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 shadow-lg relative">
-                     <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                   </div>
-                   
-                   <div className="flex flex-col flex-1 py-1 space-y-2">
-                     <span className="text-[10px] text-accent font-semibold tracking-wider uppercase">{item.category}</span>
-                     <h4 className="font-display font-medium text-lg leading-tight text-white group-hover:text-primary transition-colors">{item.title}</h4>
-                     <p className="text-sm text-muted-foreground">{item.author}</p>
-                   </div>
-
-                   <div className="self-center opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
-                      <ArrowUpRight className="text-white w-5 h-5" />
-                   </div>
-                </div>
-              </div>
-
-              {expandedItemId === item.id && (
-                <ReelCarousel itemTitle={item.title} onReelClick={handleReelClick} />
-              )}
-              
-              {i < EXPLORE_FEED.length - 1 && (
-                <div className="mt-6 h-px bg-white/5 w-full" />
-              )}
-            </motion.div>
-          ))}
-        </div>
+        {EXPLORE_FEED.map((item, i) => (
+          <motion.div 
+            key={item.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 + (i * 0.05) }}
+            data-testid={`explore-feed-item-${item.id}`}
+            className="space-y-4"
+          >
+            <h3 className="font-display font-medium text-lg text-white">{item.title}</h3>
+            <ReelCarousel onReelClick={handleReelClick} />
+            
+            {i < EXPLORE_FEED.length - 1 && (
+              <div className="mt-8 h-px bg-white/5 w-full" />
+            )}
+          </motion.div>
+        ))}
       </div>
     </div>
   );
