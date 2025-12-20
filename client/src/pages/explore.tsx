@@ -38,16 +38,14 @@ const REEL_THUMBNAILS = [
 
 function ReelCarousel({ onReelClick }: { onReelClick: (id: number) => void }) {
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [activeCardIndex, setActiveCardIndex] = useState(3);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   const handleScroll = () => {
     if (carouselRef.current) {
       const scrollLeft = carouselRef.current.scrollLeft;
       const cardWidth = 110;
       const gap = 12;
-      const containerWidth = carouselRef.current.offsetWidth;
-      const centerOffset = containerWidth / 2 - cardWidth / 2;
-      const newIndex = Math.round((scrollLeft + centerOffset) / (cardWidth + gap));
+      const newIndex = Math.round(scrollLeft / (cardWidth + gap));
       setActiveCardIndex(Math.max(0, Math.min(newIndex, REEL_THUMBNAILS.length - 1)));
     }
   };
@@ -60,27 +58,16 @@ function ReelCarousel({ onReelClick }: { onReelClick: (id: number) => void }) {
     >
       <div 
         ref={carouselRef}
-        className="flex gap-3 overflow-x-auto no-scrollbar px-0 py-2 snap-x snap-mandatory"
+        className="flex gap-3 overflow-x-auto no-scrollbar py-2 snap-x snap-mandatory"
         onScroll={handleScroll}
-        style={{ 
-          scrollPaddingLeft: 'calc(50% - 55px)',
-          scrollPaddingRight: 'calc(50% - 55px)',
-        }}
       >
-        <div className="shrink-0" style={{ width: 'calc(50% - 55px - 6px)' }} />
-        
         {REEL_THUMBNAILS.map((reel, index) => {
           const isActive = index === activeCardIndex;
           return (
             <motion.div
               key={reel.id}
-              className="shrink-0 snap-center cursor-pointer"
+              className="shrink-0 snap-start cursor-pointer"
               style={{ width: 110 }}
-              animate={{
-                scale: isActive ? 1 : 0.85,
-                opacity: isActive ? 1 : 0.6,
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
               onClick={() => onReelClick(reel.id)}
               data-testid={`reel-thumbnail-${reel.id}`}
             >
@@ -108,11 +95,9 @@ function ReelCarousel({ onReelClick }: { onReelClick: (id: number) => void }) {
             </motion.div>
           );
         })}
-        
-        <div className="shrink-0" style={{ width: 'calc(50% - 55px - 6px)' }} />
       </div>
 
-      <div className="flex justify-center gap-1">
+      <div className="flex justify-start gap-1">
         {REEL_THUMBNAILS.map((_, index) => (
           <div
             key={index}
