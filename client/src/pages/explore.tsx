@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
-import { Search, SlidersHorizontal, ArrowUpRight, ChevronLeft, Play } from "lucide-react";
+import { useState, useRef } from "react";
+import { Search, SlidersHorizontal, ArrowUpRight, Play } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import discoverImg from "@assets/generated_images/abstract_discovery_card_art.png";
 import textureImg from "@assets/generated_images/dark_abstract_gradient_texture.png";
@@ -36,41 +36,15 @@ const REEL_THUMBNAILS = [
   { id: 8, img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80", title: "Growth" },
 ];
 
-export default function ExplorePage() {
-  const [activeCat, setActiveCat] = useState("All");
-  const [selectedTrending, setSelectedTrending] = useState<typeof EXPLORE_FEED[0] | null>(null);
-  const [_, setLocation] = useLocation();
+function ReelCarousel({ itemTitle, onReelClick }: { itemTitle: string; onReelClick: (id: number) => void }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeCardIndex, setActiveCardIndex] = useState(3);
-
-  const handleItemClick = (item: typeof EXPLORE_FEED[0]) => {
-    setSelectedTrending(item);
-    setActiveCardIndex(3);
-  };
-
-  const handleReelClick = (reelId: number) => {
-    setLocation(`/reels?from=explore&reelId=${reelId}`);
-  };
-
-  const handleBack = () => {
-    setSelectedTrending(null);
-  };
-
-  useEffect(() => {
-    if (selectedTrending && carouselRef.current) {
-      const cardWidth = 140;
-      const gap = 16;
-      const containerWidth = carouselRef.current.offsetWidth;
-      const scrollTo = (activeCardIndex * (cardWidth + gap)) - (containerWidth / 2) + (cardWidth / 2);
-      carouselRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
-    }
-  }, [selectedTrending, activeCardIndex]);
 
   const handleScroll = () => {
     if (carouselRef.current) {
       const scrollLeft = carouselRef.current.scrollLeft;
-      const cardWidth = 140;
-      const gap = 16;
+      const cardWidth = 100;
+      const gap = 12;
       const containerWidth = carouselRef.current.offsetWidth;
       const centerOffset = containerWidth / 2 - cardWidth / 2;
       const newIndex = Math.round((scrollLeft + centerOffset) / (cardWidth + gap));
@@ -78,112 +52,105 @@ export default function ExplorePage() {
     }
   };
 
-  if (selectedTrending) {
-    return (
-      <div className="h-full flex flex-col bg-background">
-        <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-lg px-4 py-4 border-b border-white/5">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={handleBack}
-              className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors"
-              data-testid="button-trending-back"
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      className="mt-4 space-y-3"
+    >
+      <p className="text-sm font-medium text-white/70 px-2">{itemTitle} Reels</p>
+      
+      <div 
+        ref={carouselRef}
+        className="flex gap-3 overflow-x-auto no-scrollbar px-2 py-2 snap-x snap-mandatory"
+        onScroll={handleScroll}
+        style={{ 
+          scrollPaddingLeft: 'calc(50% - 50px)',
+          scrollPaddingRight: 'calc(50% - 50px)',
+        }}
+      >
+        <div className="shrink-0" style={{ width: 'calc(50% - 50px - 6px)' }} />
+        
+        {REEL_THUMBNAILS.map((reel, index) => {
+          const isActive = index === activeCardIndex;
+          return (
+            <motion.div
+              key={reel.id}
+              className="shrink-0 snap-center cursor-pointer"
+              style={{ width: 100 }}
+              animate={{
+                scale: isActive ? 1 : 0.85,
+                opacity: isActive ? 1 : 0.6,
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              onClick={() => onReelClick(reel.id)}
+              data-testid={`reel-thumbnail-${reel.id}`}
             >
-              <ChevronLeft size={24} className="text-white" />
-            </button>
-            <div className="flex-1">
-              <h1 className="font-display text-xl font-semibold text-white">{selectedTrending.title}</h1>
-              <p className="text-sm text-muted-foreground">{selectedTrending.author}</p>
-            </div>
-            <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
-              {selectedTrending.category}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="flex-1 flex flex-col justify-center py-8">
-          <div className="mb-6 px-4">
-            <h2 className="text-lg font-medium text-white mb-1">Related Reels</h2>
-            <p className="text-sm text-muted-foreground">Swipe to explore</p>
-          </div>
-
-          <div 
-            ref={carouselRef}
-            className="flex gap-4 overflow-x-auto no-scrollbar px-4 py-4 snap-x snap-mandatory"
-            onScroll={handleScroll}
-            style={{ 
-              scrollPaddingLeft: 'calc(50% - 70px)',
-              scrollPaddingRight: 'calc(50% - 70px)',
-            }}
-          >
-            <div className="shrink-0" style={{ width: 'calc(50% - 70px - 8px)' }} />
-            
-            {REEL_THUMBNAILS.map((reel, index) => {
-              const isActive = index === activeCardIndex;
-              return (
-                <motion.div
-                  key={reel.id}
-                  className="shrink-0 snap-center cursor-pointer"
-                  style={{ width: 140 }}
-                  animate={{
-                    scale: isActive ? 1 : 0.85,
-                    opacity: isActive ? 1 : 0.6,
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  onClick={() => handleReelClick(reel.id)}
-                  data-testid={`reel-thumbnail-${reel.id}`}
-                >
-                  <div 
-                    className={`relative overflow-hidden rounded-2xl transition-shadow duration-300 ${
-                      isActive ? 'shadow-2xl shadow-black/50' : 'shadow-lg shadow-black/30'
-                    }`}
-                    style={{ aspectRatio: '9/16' }}
-                  >
-                    <img 
-                      src={reel.img} 
-                      alt={reel.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                    
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className={`w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 ${
-                        isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                      }`}>
-                        <Play size={20} className="text-white ml-1" fill="white" />
-                      </div>
-                    </div>
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <p className={`text-sm font-medium text-white text-center drop-shadow-lg transition-opacity duration-300 ${
-                        isActive ? 'opacity-100' : 'opacity-70'
-                      }`}>
-                        {reel.title}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-            
-            <div className="shrink-0" style={{ width: 'calc(50% - 70px - 8px)' }} />
-          </div>
-
-          <div className="flex justify-center gap-1.5 mt-6">
-            {REEL_THUMBNAILS.map((_, index) => (
-              <div
-                key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === activeCardIndex 
-                    ? 'w-6 bg-white' 
-                    : 'w-1.5 bg-white/30'
+              <div 
+                className={`relative overflow-hidden rounded-xl transition-shadow duration-300 ${
+                  isActive ? 'shadow-lg shadow-black/50' : 'shadow-md shadow-black/30'
                 }`}
-              />
-            ))}
-          </div>
-        </div>
+                style={{ aspectRatio: '9/16' }}
+              >
+                <img 
+                  src={reel.img} 
+                  alt={reel.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className={`w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 ${
+                    isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                  }`}>
+                    <Play size={14} className="text-white ml-0.5" fill="white" />
+                  </div>
+                </div>
+                
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                  <p className={`text-xs font-medium text-white text-center drop-shadow-lg transition-opacity duration-300 line-clamp-2 ${
+                    isActive ? 'opacity-100' : 'opacity-70'
+                  }`}>
+                    {reel.title}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+        
+        <div className="shrink-0" style={{ width: 'calc(50% - 50px - 6px)' }} />
       </div>
-    );
-  }
+
+      <div className="flex justify-center gap-1 px-2">
+        {REEL_THUMBNAILS.map((_, index) => (
+          <div
+            key={index}
+            className={`h-1 rounded-full transition-all duration-300 ${
+              index === activeCardIndex 
+                ? 'w-4 bg-white/60' 
+                : 'w-1 bg-white/20'
+            }`}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+export default function ExplorePage() {
+  const [activeCat, setActiveCat] = useState("All");
+  const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
+  const [_, setLocation] = useLocation();
+
+  const handleReelClick = (reelId: number) => {
+    setLocation(`/reels?from=explore&reelId=${reelId}`);
+  };
+
+  const toggleCarousel = (itemId: number) => {
+    setExpandedItemId(expandedItemId === itemId ? null : itemId);
+  };
 
   return (
     <div className="pb-24 pt-4 px-4 space-y-6">
@@ -251,26 +218,33 @@ export default function ExplorePage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + (i * 0.05) }}
-              className="group cursor-pointer"
-              onClick={() => handleItemClick(item)}
               data-testid={`explore-feed-item-${item.id}`}
             >
-              <div className="flex gap-5 items-start">
-                 <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 shadow-lg relative">
-                   <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                   <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                 </div>
-                 
-                 <div className="flex flex-col flex-1 py-1 space-y-2">
-                   <span className="text-[10px] text-accent font-semibold tracking-wider uppercase">{item.category}</span>
-                   <h4 className="font-display font-medium text-lg leading-tight text-white group-hover:text-primary transition-colors">{item.title}</h4>
-                   <p className="text-sm text-muted-foreground">{item.author}</p>
-                 </div>
+              <div 
+                className="group cursor-pointer"
+                onClick={() => toggleCarousel(item.id)}
+              >
+                <div className="flex gap-5 items-start">
+                   <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 shadow-lg relative">
+                     <img src={item.img} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                   </div>
+                   
+                   <div className="flex flex-col flex-1 py-1 space-y-2">
+                     <span className="text-[10px] text-accent font-semibold tracking-wider uppercase">{item.category}</span>
+                     <h4 className="font-display font-medium text-lg leading-tight text-white group-hover:text-primary transition-colors">{item.title}</h4>
+                     <p className="text-sm text-muted-foreground">{item.author}</p>
+                   </div>
 
-                 <div className="self-center opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
-                    <ArrowUpRight className="text-white w-5 h-5" />
-                 </div>
+                   <div className="self-center opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
+                      <ArrowUpRight className="text-white w-5 h-5" />
+                   </div>
+                </div>
               </div>
+
+              {expandedItemId === item.id && (
+                <ReelCarousel itemTitle={item.title} onReelClick={handleReelClick} />
+              )}
               
               {i < EXPLORE_FEED.length - 1 && (
                 <div className="mt-6 h-px bg-white/5 w-full" />
