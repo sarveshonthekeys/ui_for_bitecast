@@ -78,6 +78,8 @@ export class MemStorage implements IStorage {
     const newMessage: Message = {
       ...message,
       id,
+      type: message.type || "text",
+      isRead: message.isRead || false,
       createdAt: new Date(),
     };
     this.messages.set(id, newMessage);

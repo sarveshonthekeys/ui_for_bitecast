@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Search, Camera, Edit, MoreHorizontal, Send, Smile } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
+
+const EMOJIS = ["👍", "❤️", "😂", "🔥", "😍"];
 
 const CONVERSATIONS = [
   {
@@ -54,12 +56,13 @@ const CONVERSATIONS = [
   },
 ];
 
-const CHAT_MESSAGES = [
-  { id: 1, senderId: "you", content: "Hey, did you see the latest research on sleep?", timestamp: "10:30 AM", reactions: [] },
-  { id: 2, senderId: "other", content: "Not yet! Send me the link", timestamp: "10:32 AM", reactions: [{ emoji: "👍", users: ["you"] }] },
-  { id: 3, senderId: "you", content: "Just shared it", timestamp: "10:33 AM", reactions: [] },
-  { id: 4, senderId: "other", content: "Thanks for sharing that study! I'll check it out.", timestamp: "10:35 AM", reactions: [{ emoji: "🔥", users: ["you"] }] },
-];
+interface Message {
+  id: number;
+  senderId: "you" | "other";
+  content: string;
+  timestamp: string;
+  reactions: string[];
+}
 
 function ConversationsList({ onSelectConversation }: { onSelectConversation: (id: number) => void }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -158,9 +161,70 @@ function ConversationsList({ onSelectConversation }: { onSelectConversation: (id
 
 function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack: () => void }) {
   const [messageText, setMessageText] = useState("");
+  const [messages, setMessages] = useState<Message[]>([
+    { id: 1, senderId: "you", content: "Hey, did you see the latest research on sleep?", timestamp: "10:30 AM", reactions: [] },
+    { id: 2, senderId: "other", content: "Not yet! Send me the link", timestamp: "10:32 AM", reactions: ["👍"] },
+    { id: 3, senderId: "you", content: "Just shared it", timestamp: "10:33 AM", reactions: [] },
+    { id: 4, senderId: "other", content: "Thanks for sharing that study! I'll check it out.", timestamp: "10:35 AM", reactions: ["🔥"] },
+  ]);
+  const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const conversation = CONVERSATIONS.find((c) => c.id === conversationId);
 
   if (!conversation) return null;
+
+  const handleSendMessage = () => {
+    if (!messageText.trim()) return;
+
+    const newMessage: Message = {
+      id: messages.length + 1,
+      senderId: "you",
+      content: messageText,
+      timestamp: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+      reactions: [],
+    };
+
+    setMessages([...messages, newMessage]);
+    setMessageText("");
+  };
+
+  const handleMessageLongPress = (messageId: number) => {
+    setSelectedMessageId(messageId);
+    setShowEmojiPicker(true);
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    if (selectedMessageId === null) return;
+
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === selectedMessageId
+          ? {
+              ...msg,
+              reactions: msg.reactions.includes(emoji)
+                ? msg.reactions.filter((e) => e !== emoji)
+                : [...msg.reactions, emoji],
+            }
+          : msg
+      )
+    );
+
+    setShowEmojiPicker(false);
+    setSelectedMessageId(null);
+  };
+
+  const handleMouseDown = (messageId: number) => {
+    longPressTimeoutRef.current = setTimeout(() => {
+      handleMessageLongPress(messageId);
+    }, 500);
+  };
+
+  const handleMouseUp = () => {
+    if (longPressTimeoutRef.current) {
+      clearTimeout(longPressTimeoutRef.current);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -188,7 +252,7 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
       </div>
 
       <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-3">
-        {CHAT_MESSAGES.map((msg, i) => (
+        {messages.map((msg, i) => (
           <motion.div
             key={msg.id}
             initial={{ opacity: 0, y: 10 }}
@@ -196,20 +260,34 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
             transition={{ delay: i * 0.05 }}
             className={`flex ${msg.senderId === "you" ? "justify-end" : "justify-start"}`}
             data-testid={`message-${msg.id}`}
+            onMouseDown={() => handleMouseDown(msg.id)}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
           >
-            <div
-              className={`max-w-xs px-3 py-2 rounded-2xl ${
-                msg.senderId === "you"
-                  ? "bg-primary text-primary-foreground rounded-br-none"
-                  : "bg-white/10 text-white rounded-bl-none"
-              }`}
-            >
-              <p className="text-sm leading-relaxed">{msg.content}</p>
+            <div className="relative">
+              <div
+                className={`max-w-xs px-3 py-2 rounded-2xl ${
+                  msg.senderId === "you"
+                    ? "bg-primary text-primary-foreground rounded-br-none"
+                    : "bg-white/10 text-white rounded-bl-none"
+                }`}
+              >
+                <p className="text-sm leading-relaxed">{msg.content}</p>
+              </div>
+
               {msg.reactions.length > 0 && (
-                <div className="flex gap-1 mt-1 flex-wrap">
-                  {msg.reactions.map((reaction, idx) => (
-                    <span key={idx} className="text-xs bg-white/20 px-1.5 py-0.5 rounded-full">
-                      {reaction.emoji}
+                <div
+                  className={`absolute top-full mt-1 flex gap-1 ${
+                    msg.senderId === "you" ? "right-0" : "left-0"
+                  }`}
+                >
+                  {msg.reactions.map((emoji, idx) => (
+                    <span
+                      key={idx}
+                      className="text-sm bg-white/20 backdrop-blur-sm px-1.5 py-0.5 rounded-full cursor-pointer hover:bg-white/30 transition-colors"
+                      onClick={() => setMessages(prev => prev.map(m => m.id === msg.id ? {...m, reactions: m.reactions.filter(e => e !== emoji)} : m))}
+                    >
+                      {emoji}
                     </span>
                   ))}
                 </div>
@@ -219,9 +297,40 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
         ))}
       </div>
 
+      <AnimatePresence>
+        {showEmojiPicker && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed inset-0 bg-black/50 flex items-end z-50"
+            onClick={() => {
+              setShowEmojiPicker(false);
+              setSelectedMessageId(null);
+            }}
+          >
+            <motion.div
+              className="bg-background w-full rounded-t-2xl p-4 flex gap-2 justify-center border-t border-white/10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => handleEmojiSelect(emoji)}
+                  className="text-3xl p-3 rounded-xl hover:bg-white/10 transition-colors"
+                  data-testid={`emoji-${emoji.codePointAt(0)}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="sticky bottom-0 bg-background border-t border-white/5 px-4 py-3">
         <div className="flex items-center gap-2">
-          <Button size="icon" variant="ghost" className="rounded-full" data-testid="button-emoji">
+          <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setShowEmojiPicker(true)} data-testid="button-emoji">
             <Smile size={20} />
           </Button>
           <Input
@@ -229,13 +338,19 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
             className="flex-1 bg-card border-none rounded-full h-10"
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleSendMessage();
+              }
+            }}
             data-testid="input-message"
           />
-          <Button 
-            size="icon" 
-            variant="ghost" 
-            className="rounded-full" 
+          <Button
+            size="icon"
+            variant="ghost"
+            className="rounded-full"
             disabled={!messageText.trim()}
+            onClick={handleSendMessage}
             data-testid="button-send"
           >
             <Send size={20} />
@@ -251,8 +366,8 @@ export default function MessagesPage() {
 
   if (selectedConversation) {
     return (
-      <ChatScreen 
-        conversationId={selectedConversation} 
+      <ChatScreen
+        conversationId={selectedConversation}
         onBack={() => setSelectedConversation(null)}
       />
     );
