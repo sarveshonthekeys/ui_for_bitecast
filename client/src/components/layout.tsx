@@ -1,14 +1,17 @@
 import { Link, useLocation } from "wouter";
 import { Home, Compass, Library, User, Play, Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useContext } from "react";
+import { ChatContext } from "@/App";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const { isInChat } = useContext(ChatContext);
 
   const isReels = location === "/reels";
   const isStory = location.startsWith("/story/");
   const isLogin = location === "/auth";
-  const hideNavigation = isReels || isStory;
+  const hideNavigation = isReels || isStory || isInChat;
 
   if (isLogin) {
     return <main className="min-h-screen w-full bg-background text-foreground font-sans noise-bg">{children}</main>;

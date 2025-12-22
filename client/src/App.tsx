@@ -2,6 +2,7 @@ import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { createContext, useState } from "react";
 import NotFound from "@/pages/not-found";
 import Layout from "@/components/layout";
 import HomePage from "@/pages/home";
@@ -13,6 +14,14 @@ import ProfilePage from "@/pages/profile";
 import MessagesPage from "@/pages/messages";
 import NotificationsPage from "@/pages/notifications";
 import StoryPage from "@/pages/story";
+
+export const ChatContext = createContext<{
+  isInChat: boolean;
+  setIsInChat: (value: boolean) => void;
+}>({
+  isInChat: false,
+  setIsInChat: () => {},
+});
 
 function Router() {
   return (
@@ -34,10 +43,14 @@ function Router() {
 }
 
 function App() {
+  const [isInChat, setIsInChat] = useState(false);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Router />
+      <ChatContext.Provider value={{ isInChat, setIsInChat }}>
+        <Toaster />
+        <Router />
+      </ChatContext.Provider>
     </QueryClientProvider>
   );
 }

@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Search, Camera, Edit, MoreHorizontal, Send, Smile } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
+import { ChatContext } from "@/App";
 
 const EMOJIS = ["👍", "❤️", "😂", "🔥", "😍"];
 
@@ -169,8 +170,16 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
   ]);
   const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
   const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const messageRefsRef = useRef<Map<number, HTMLDivElement>>(new Map());
+  const { setIsInChat } = useContext(ChatContext);
   const conversation = CONVERSATIONS.find((c) => c.id === conversationId);
+
+  useEffect(() => {
+    setIsInChat(true);
+    return () => setIsInChat(false);
+  }, [setIsInChat]);
 
   if (!conversation) return null;
 
@@ -190,6 +199,14 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
   };
 
   const handleMessageLongPress = (messageId: number) => {
+    const messageEl = messageRefsRef.current.get(messageId);
+    if (messageEl) {
+      const rect = messageEl.getBoundingClientRect();
+      setPickerPosition({
+        top: rect.top - 60,
+        left: rect.left,
+      });
+    }
     setSelectedMessageId(messageId);
     setShowEmojiPicker(true);
   };
@@ -263,6 +280,9 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
             onMouseDown={() => handleMouseDown(msg.id)}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
+            ref={(el) => {
+              if (el) messageRefsRef.current.set(msg.id, el);
+            }}
           >
             <div className="relative">
               <div
@@ -299,32 +319,40 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
 
       <AnimatePresence>
         {showEmojiPicker && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed inset-0 bg-black/50 flex items-end z-50"
-            onClick={() => {
-              setShowEmojiPicker(false);
-              setSelectedMessageId(null);
-            }}
-          >
+          <>
             <motion.div
-              className="bg-background w-full rounded-t-2xl p-4 flex gap-2 justify-center border-t border-white/10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              onClick={() => {
+                setShowEmojiPicker(false);
+                setSelectedMessageId(null);
+              }}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="fixed bg-background rounded-xl p-3 flex gap-2 justify-center border border-white/10 z-50"
+              style={{
+                top: `${pickerPosition.top}px`,
+                left: `${pickerPosition.left}px`,
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               {EMOJIS.map((emoji) => (
                 <button
                   key={emoji}
                   onClick={() => handleEmojiSelect(emoji)}
-                  className="text-3xl p-3 rounded-xl hover:bg-white/10 transition-colors"
+                  className="text-2xl p-2 rounded-lg hover:bg-white/10 transition-colors"
                   data-testid={`emoji-${emoji.codePointAt(0)}`}
                 >
                   {emoji}
                 </button>
               ))}
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
 
