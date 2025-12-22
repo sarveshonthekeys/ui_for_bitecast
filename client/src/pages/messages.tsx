@@ -2,7 +2,7 @@ import { useState, useRef, useContext, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, Camera, Edit, MoreHorizontal, Send, Smile } from "lucide-react";
+import { ArrowLeft, Search, Camera, Edit, MoreHorizontal, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { ChatContext } from "@/App";
@@ -358,9 +358,6 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
 
       <div className="sticky bottom-0 bg-background border-t border-white/5 px-4 py-3">
         <div className="flex items-center gap-2">
-          <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setShowEmojiPicker(true)} data-testid="button-emoji">
-            <Smile size={20} />
-          </Button>
           <Input
             placeholder="Message..."
             className="flex-1 bg-card border-none rounded-full h-10"
