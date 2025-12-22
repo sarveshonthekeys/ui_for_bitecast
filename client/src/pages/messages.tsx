@@ -368,6 +368,8 @@ function ChatScreen({ conversationId, onBack }: { conversationId: number; onBack
                 handleSendMessage();
               }
             }}
+            autoFocus
+            inputMode="text"
             data-testid="input-message"
           />
           <Button
