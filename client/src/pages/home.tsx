@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Play, MoreHorizontal, Heart, MessageCircle, Share2, Bookmark, Bell, MessageSquare } from "lucide-react";
+import { Play, MoreHorizontal, Heart, MessageCircle, Share2, Bookmark, Bell } from "lucide-react";
 import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 import cardImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import { motion } from "framer-motion";
@@ -98,11 +98,6 @@ export default function HomePage() {
       <div className="px-4 pb-4 flex justify-between items-center">
         <h1 className="font-display text-2xl font-semibold" data-testid="text-app-title">Bitecast</h1>
         <div className="flex gap-4 items-center">
-          <Link href="/messages">
-            <Button size="icon" variant="ghost" className="rounded-full" data-testid="button-messages">
-              <MessageSquare size={20} />
-            </Button>
-          </Link>
           <Link href="/notifications">
             <Button size="icon" variant="ghost" className="rounded-full relative" data-testid="button-notifications">
                <span className="sr-only">Notifications</span>
