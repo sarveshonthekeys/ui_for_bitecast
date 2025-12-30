@@ -1,5 +1,5 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Clock, Heart, Play } from "lucide-react";
+import { Clock, Heart, Play, Play as PlayIcon } from "lucide-react";
 import cardImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import textureImg from "@assets/generated_images/dark_abstract_gradient_texture.png";
 
@@ -19,6 +19,22 @@ const SECTIONS = [
     items: [
       { id: 4, title: "Atomic Habits", author: "James Clear", img: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=800&q=80" },
       { id: 5, title: "Deep Work", author: "Cal Newport", img: textureImg },
+    ]
+  },
+  {
+    title: "Continue Watching",
+    icon: <PlayIcon size={16} className="text-emerald-400" />,
+    items: [
+      { id: 6, title: "Mindset Mastery", author: "Carol Dweck", img: "https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=150&h=150&fit=crop&crop=faces", watched: 5, total: 12 },
+      { id: 7, title: "The Tim Ferriss Show", author: "Tim Ferriss", img: "https://images.unsplash.com/photo-1505373877841-efb58603ba67?w=150&h=150&fit=crop&crop=faces", watched: 8, total: 20 },
+      { id: 8, title: "Lex Fridman Podcast", author: "Lex Fridman", img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=150&h=150&fit=crop&crop=faces", watched: 3, total: 15 },
+      { id: 9, title: "Rich Roll Podcast", author: "Rich Roll", img: "https://images.unsplash.com/photo-1484633569332-a0f79b18d444?w=150&h=150&fit=crop&crop=faces", watched: 11, total: 18 },
+      { id: 10, title: "On Purpose with Jay Shetty", author: "Jay Shetty", img: "https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=150&h=150&fit=crop&crop=faces", watched: 6, total: 14 },
+      { id: 11, title: "The Joe Rogan Experience", author: "Joe Rogan", img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=150&h=150&fit=crop&crop=faces", watched: 2, total: 10 },
+      { id: 12, title: "Bankless", author: "Ryan Sean Adams", img: "https://images.unsplash.com/photo-1505373877841-efb58603ba67?w=150&h=150&fit=crop&crop=faces", watched: 9, total: 16 },
+      { id: 13, title: "StartUp Podcast", author: "Gimlet Media", img: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=150&h=150&fit=crop&crop=faces", watched: 7, total: 13 },
+      { id: 14, title: "Philosophize This", author: "Stephen West", img: cardImg, watched: 4, total: 22 },
+      { id: 15, title: "The Knowledge Project", author: "Shane Parrish", img: textureImg, watched: 10, total: 17 },
     ]
   }
 ];
@@ -46,6 +62,11 @@ export default function LibraryPage() {
                         <Play size={14} fill="white" className="text-white ml-0.5" />
                       </div>
                     </div>
+                    {'watched' in item && 'total' in item && (
+                      <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md">
+                        <span className="text-xs font-medium text-white">{item.watched}/{item.total}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-medium text-sm truncate leading-none">{item.title}</h3>
