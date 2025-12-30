@@ -1,5 +1,5 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Clock, Download, Heart, Play } from "lucide-react";
+import { Clock, Heart, Play } from "lucide-react";
 import cardImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import textureImg from "@assets/generated_images/dark_abstract_gradient_texture.png";
 
@@ -19,13 +19,6 @@ const SECTIONS = [
     items: [
       { id: 4, title: "Atomic Habits", author: "James Clear", img: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=800&q=80" },
       { id: 5, title: "Deep Work", author: "Cal Newport", img: textureImg },
-    ]
-  },
-  {
-    title: "Downloads",
-    icon: <Download size={16} className="text-green-400" />,
-    items: [
-      { id: 6, title: "The Daily Stoic", author: "Ryan Holiday", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=150&h=150&fit=crop&crop=faces" },
     ]
   }
 ];
