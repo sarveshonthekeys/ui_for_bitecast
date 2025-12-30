@@ -66,6 +66,19 @@ const saveSavedReels = (reels: Set<number>) => {
   localStorage.setItem('savedReels', JSON.stringify(Array.from(reels)));
 };
 
+const getDislikedReels = (): Set<number> => {
+  try {
+    const stored = localStorage.getItem('dislikedReels');
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  } catch {
+    return new Set();
+  }
+};
+
+const saveDislikedReels = (reels: Set<number>) => {
+  localStorage.setItem('dislikedReels', JSON.stringify(Array.from(reels)));
+};
+
 export default function ReelsPage() {
   const [_, setLocation] = useLocation();
   const searchString = useSearch();
@@ -79,6 +92,7 @@ export default function ReelsPage() {
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("left");
   const [likedReels, setLikedReels] = useState<Set<number>>(() => getLikedReels());
   const [savedReels, setSavedReels] = useState<Set<number>>(() => getSavedReels());
+  const [dislikedReels, setDislikedReels] = useState<Set<number>>(() => getDislikedReels());
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
@@ -155,6 +169,18 @@ export default function ReelsPage() {
   }, [savedReels, currentReel.id]);
 
   const isCurrentReelSaved = savedReels.has(currentReel.id);
+  const isCurrentReelDisliked = dislikedReels.has(currentReel.id);
+
+  const toggleDislike = useCallback(() => {
+    const newDislikedReels = new Set(dislikedReels);
+    if (newDislikedReels.has(currentReel.id)) {
+      newDislikedReels.delete(currentReel.id);
+    } else {
+      newDislikedReels.add(currentReel.id);
+    }
+    setDislikedReels(newDislikedReels);
+    saveDislikedReels(newDislikedReels);
+  }, [dislikedReels, currentReel.id]);
 
   const handleDoubleTap = useCallback(() => {
     if (!isCurrentReelLiked) {
@@ -419,8 +445,16 @@ export default function ReelsPage() {
         </div>
 
         <div className="flex flex-col items-center gap-1">
-          <button className="p-2 rounded-full hover:bg-white/10 transition-colors" title="Not Interested" data-testid="button-reel-dislike">
-            <ThumbsDown size={28} className="text-white drop-shadow-sm" />
+          <button 
+            className="p-2 rounded-full hover:bg-white/10 transition-colors" 
+            title="Not Interested" 
+            onClick={toggleDislike}
+            data-testid="button-reel-dislike"
+          >
+            <ThumbsDown 
+              size={28} 
+              className={isCurrentReelDisliked ? "text-white fill-white drop-shadow-sm" : "text-white drop-shadow-sm"} 
+            />
           </button>
         </div>
 

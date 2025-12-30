@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Play, MoreHorizontal, Heart, MessageCircle, Bookmark, Bell } from "lucide-react";
+import { Play, MoreHorizontal, Heart, MessageCircle, Bookmark, Bell, ThumbsDown } from "lucide-react";
 import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 import cardImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import { motion } from "framer-motion";
@@ -117,6 +117,7 @@ export default function HomePage() {
   const [_, setLocation] = useLocation();
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
   const [savedPosts, setSavedPosts] = useState<Set<number>>(new Set());
+  const [dislikedPosts, setDislikedPosts] = useState<Set<number>>(new Set());
   const lastTapTimeRef = useRef<{ [key: number]: number }>({});
 
   const handlePostClick = (postId: number) => {
@@ -141,6 +142,18 @@ export default function HomePage() {
 
   const toggleSave = (postId: number) => {
     setSavedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleDislike = (postId: number) => {
+    setDislikedPosts(prev => {
       const newSet = new Set(prev);
       if (newSet.has(postId)) {
         newSet.delete(postId);
@@ -211,6 +224,7 @@ export default function HomePage() {
         {FEED_ITEMS.map((item, i) => {
           const isLiked = likedPosts.has(item.id);
           const isSaved = savedPosts.has(item.id);
+          const isDisliked = dislikedPosts.has(item.id);
           
           return (
             <div key={item.id}>
@@ -279,6 +293,17 @@ export default function HomePage() {
                         <span className="text-xs font-medium text-muted-foreground">{item.comments}</span>
                       </Button>
                     </CommentsPanel>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-auto w-auto p-0 hover:bg-transparent text-white" 
+                      onClick={() => toggleDislike(item.id)}
+                      data-testid={`button-dislike-${item.id}`}
+                    >
+                      <ThumbsDown 
+                        className={`w-6 h-6 transition-colors ${isDisliked ? 'fill-white' : ''}`}
+                      />
+                    </Button>
                   </div>
                   <Button 
                     variant="ghost" 
