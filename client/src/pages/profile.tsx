@@ -1,13 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, Bell, Bookmark, History, Target, HelpCircle, LogOut, ChevronRight } from "lucide-react";
+import { Settings, History, Target, HelpCircle, LogOut, ChevronRight } from "lucide-react";
 import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 
 const MENU_ITEMS = [
   { icon: Settings, label: "Account Settings" },
-  { icon: Shield, label: "Privacy & Security" },
-  { icon: Bell, label: "Notifications" },
-  { icon: Bookmark, label: "Saved Content" },
   { icon: History, label: "Activity History" },
   { icon: Target, label: "Goals & Preferences" },
   { icon: HelpCircle, label: "Help & Support" },
