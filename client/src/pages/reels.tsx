@@ -201,6 +201,19 @@ export default function ReelsPage() {
   const handleWheel = (e: React.WheelEvent) => {
     if (commentsOpen) return;
     
+    // Handle horizontal scrolling (left/right)
+    if (Math.abs(e.deltaX) > 30) {
+      if (e.deltaX < 0) {
+        // Scrolling left - next reel
+        goToNext();
+      } else if (e.deltaX > 0) {
+        // Scrolling right - previous reel
+        goToPrev();
+      }
+      return;
+    }
+    
+    // Handle vertical scrolling (up/down)
     if (showDescription) {
       if (e.deltaY > 30) {
         // Scrolling down in description
