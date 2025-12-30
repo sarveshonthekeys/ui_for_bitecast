@@ -67,13 +67,16 @@ export default function ReelsPage() {
   const [likedReels, setLikedReels] = useState<Set<number>>(() => getLikedReels());
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
+  const touchStartX = useRef(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const isScrolling = useRef(false);
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const tapCountRef = useRef(0);
   const heartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const descriptionScrollRef = useRef(0);
 
   const togglePlay = () => setIsPlaying(!isPlaying);
   const toggleHashtags = () => setShowHashtags(!showHashtags);
@@ -145,28 +148,69 @@ export default function ReelsPage() {
   const handleTouchStart = (e: React.TouchEvent) => {
     if (commentsOpen) return;
     touchStartY.current = e.touches[0].clientY;
+    touchStartX.current = e.touches[0].clientX;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (commentsOpen) return;
     const touchEndY = e.changedTouches[0].clientY;
+    const touchEndX = e.changedTouches[0].clientX;
     const diffY = touchStartY.current - touchEndY;
+    const diffX = touchStartX.current - touchEndX;
 
-    if (Math.abs(diffY) > 50) {
-      if (diffY > 0) {
+    // Horizontal swipe for next/previous reels
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      if (diffX > 0) {
+        // Swiped left - next reel
         goToNext();
       } else {
+        // Swiped right - previous reel
         goToPrev();
+      }
+      return;
+    }
+
+    // Vertical swipe for description panel
+    if (Math.abs(diffY) > 50) {
+      if (diffY < 0 && !showDescription) {
+        // Swiped up - show description
+        setShowDescription(true);
+        descriptionScrollRef.current = 0;
+      } else if (diffY > 0 && showDescription) {
+        // Swiped down - hide description or go back
+        if (descriptionScrollRef.current === 0) {
+          descriptionScrollRef.current = 1;
+        } else {
+          setShowDescription(false);
+          descriptionScrollRef.current = 0;
+          handleBack();
+        }
       }
     }
   };
 
   const handleWheel = (e: React.WheelEvent) => {
     if (commentsOpen) return;
-    if (e.deltaY > 30) {
-      goToNext();
-    } else if (e.deltaY < -30) {
-      goToPrev();
+    
+    if (showDescription) {
+      if (e.deltaY > 30) {
+        // Scrolling down
+        if (descriptionScrollRef.current === 0) {
+          descriptionScrollRef.current = 1;
+        } else {
+          setShowDescription(false);
+          descriptionScrollRef.current = 0;
+          handleBack();
+        }
+      } else if (e.deltaY < -30) {
+        // Scrolling up - stay in description
+      }
+    } else {
+      if (e.deltaY > 30) {
+        goToNext();
+      } else if (e.deltaY < -30) {
+        goToPrev();
+      }
     }
   };
 
@@ -361,6 +405,83 @@ export default function ReelsPage() {
           )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showDescription && (
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="absolute inset-0 z-30 bg-black/95 backdrop-blur-md flex flex-col"
+            data-testid="panel-reel-description"
+          >
+            <div className="flex-1 overflow-y-auto p-6 pt-8">
+              <button
+                onClick={() => setShowDescription(false)}
+                className="absolute top-4 left-4 p-2 rounded-full hover:bg-white/10 transition-colors"
+                data-testid="button-description-close"
+              >
+                <ChevronLeft size={28} className="text-white" />
+              </button>
+              
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-2">About</h2>
+                  <p className="text-base text-white/80 leading-relaxed">{currentReel.title}</p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-3">Creator</h3>
+                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                    <Avatar className="w-12 h-12 border-2 border-white/30">
+                      <AvatarImage src={currentReel.avatar} />
+                      <AvatarFallback>AU</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-semibold text-white" data-testid="text-description-author">{currentReel.author}</p>
+                      <p className="text-xs text-white/60">Creator</p>
+                    </div>
+                    <button className="px-4 py-2 rounded-md border border-white/30 text-sm font-medium backdrop-blur-sm hover:bg-white/5 transition-colors" data-testid="button-description-follow">
+                      Follow
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-3">Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {currentReel.hashtags.split(" ").map((tag, idx) => (
+                      <span key={idx} className="px-3 py-1 bg-white/10 text-white/80 text-xs rounded-full border border-white/20" data-testid={`tag-${idx}`}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-white/5 p-4 rounded-lg text-center border border-white/10">
+                    <p className="text-2xl font-bold text-white">{currentReel.likes}</p>
+                    <p className="text-xs text-white/60 mt-1">Likes</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-lg text-center border border-white/10">
+                    <p className="text-2xl font-bold text-white">{currentReel.comments}</p>
+                    <p className="text-xs text-white/60 mt-1">Comments</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-lg text-center border border-white/10">
+                    <p className="text-2xl font-bold text-white">-</p>
+                    <p className="text-xs text-white/60 mt-1">Shares</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-white/10 bg-black/50">
+              <p className="text-xs text-white/50 text-center">Scroll up to dismiss or swipe down to go back</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
