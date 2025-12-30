@@ -170,19 +170,28 @@ export default function ReelsPage() {
       return;
     }
 
-    // Vertical swipe for description panel
+    // Vertical swipe for description panel and navigation
     if (Math.abs(diffY) > 50) {
-      if (diffY < 0 && !showDescription) {
-        // Swiped up - show description
-        setShowDescription(true);
-        descriptionScrollRef.current = 0;
-      } else if (diffY > 0 && showDescription) {
-        // Swiped down - hide description or go back
-        if (descriptionScrollRef.current === 0) {
-          descriptionScrollRef.current = 1;
-        } else {
-          setShowDescription(false);
+      if (showDescription) {
+        if (diffY > 0) {
+          // Swiped down in description
+          if (descriptionScrollRef.current === 0) {
+            // First swipe down - hide description
+            descriptionScrollRef.current = 1;
+            setShowDescription(false);
+          } else {
+            // Second swipe down - go back
+            descriptionScrollRef.current = 0;
+            handleBack();
+          }
+        }
+      } else {
+        if (diffY < 0) {
+          // Swiped up - show description
+          setShowDescription(true);
           descriptionScrollRef.current = 0;
+        } else if (diffY > 0) {
+          // Swiped down - go back to previous page
           handleBack();
         }
       }
@@ -194,22 +203,25 @@ export default function ReelsPage() {
     
     if (showDescription) {
       if (e.deltaY > 30) {
-        // Scrolling down
+        // Scrolling down in description
         if (descriptionScrollRef.current === 0) {
+          // First scroll down - hide description
           descriptionScrollRef.current = 1;
-        } else {
           setShowDescription(false);
+        } else {
+          // Second scroll down - go back
           descriptionScrollRef.current = 0;
           handleBack();
         }
-      } else if (e.deltaY < -30) {
-        // Scrolling up - stay in description
       }
     } else {
-      if (e.deltaY > 30) {
-        goToNext();
-      } else if (e.deltaY < -30) {
-        goToPrev();
+      if (e.deltaY < -30) {
+        // Scrolling up - show description
+        setShowDescription(true);
+        descriptionScrollRef.current = 0;
+      } else if (e.deltaY > 30) {
+        // Scrolling down - go back to previous page
+        handleBack();
       }
     }
   };
