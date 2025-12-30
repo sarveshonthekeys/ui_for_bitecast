@@ -11,6 +11,7 @@ import ExplorePage from "@/pages/explore";
 import ReelsPage from "@/pages/reels";
 import LibraryPage from "@/pages/library";
 import ProfilePage from "@/pages/profile";
+import CreatorProfilePage from "@/pages/creator-profile";
 import NotificationsPage from "@/pages/notifications";
 import StoryPage from "@/pages/story";
 
@@ -32,6 +33,7 @@ function Router() {
         <Route path="/reels" component={ReelsPage} />
         <Route path="/library" component={LibraryPage} />
         <Route path="/profile" component={ProfilePage} />
+        <Route path="/creator/:id" component={CreatorProfilePage} />
         <Route path="/story/:id" component={StoryPage} />
         <Route path="/notifications" component={NotificationsPage} />
         <Route component={NotFound} />
