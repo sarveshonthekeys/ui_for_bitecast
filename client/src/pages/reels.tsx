@@ -185,14 +185,14 @@ export default function ReelsPage() {
     const diffY = touchStartY.current - touchEndY;
     const diffX = touchStartX.current - touchEndX;
 
-    // Horizontal swipe for next/previous reels (inverted)
+    // Horizontal swipe for next/previous reels
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
       if (diffX > 0) {
-        // Swiped left - next reel (inverted)
-        goToNext();
-      } else {
-        // Swiped right - previous reel (inverted)
+        // Swiped left - previous reel
         goToPrev();
+      } else {
+        // Swiped right - next reel
+        goToNext();
       }
       return;
     }
@@ -228,14 +228,14 @@ export default function ReelsPage() {
   const handleWheel = (e: React.WheelEvent) => {
     if (commentsOpen) return;
     
-    // Handle horizontal scrolling (left/right) - inverted
+    // Handle horizontal scrolling (left/right)
     if (Math.abs(e.deltaX) > 30) {
       if (e.deltaX < 0) {
-        // Scrolling left - next reel (inverted)
-        goToNext();
-      } else if (e.deltaX > 0) {
-        // Scrolling right - previous reel (inverted)
+        // Scrolling left - previous reel
         goToPrev();
+      } else if (e.deltaX > 0) {
+        // Scrolling right - next reel
+        goToNext();
       }
       return;
     }
