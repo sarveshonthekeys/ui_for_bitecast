@@ -285,7 +285,7 @@ export default function HomePage() {
                   className="mt-6 space-y-3"
                   data-testid="carousel-section-1"
                 >
-                  <h3 className="text-lg font-medium px-1" data-testid="text-carousel-title-1">Trending Reels</h3>
+                  <h3 className="text-lg font-medium px-1" data-testid="text-carousel-title-1">Mindset Daily</h3>
                   <ReelCarousel onReelClick={handleReelClick} />
                   <div className="h-px bg-border/50 w-full mt-2" />
                 </motion.div>
@@ -302,7 +302,7 @@ export default function HomePage() {
             className="mt-6 space-y-3"
             data-testid="carousel-section-2"
           >
-            <h3 className="text-lg font-medium px-1">Self-Improvement</h3>
+            <h3 className="text-lg font-medium px-1">Focus University</h3>
             <ReelCarousel onReelClick={handleReelClick} />
             <div className="h-px bg-border/50 w-full mt-2" />
           </motion.div>
