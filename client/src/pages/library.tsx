@@ -8,17 +8,17 @@ const SECTIONS = [
     title: "Liked Podcasts",
     icon: <Heart size={16} className="text-red-400" />,
     items: [
-      { id: 1, title: "Mental Models", author: "Farnam Street", img: cardImg },
-      { id: 2, title: "Huberman Lab", author: "Andrew Huberman", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces" },
-      { id: 3, title: "Naval", author: "Naval Ravikant", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=faces" },
+      { id: 1, title: "Mental Models", author: "Farnam Street", img: cardImg, watched: 3, total: 8 },
+      { id: 2, title: "Huberman Lab", author: "Andrew Huberman", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces", watched: 12, total: 18 },
+      { id: 3, title: "Naval", author: "Naval Ravikant", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=faces", watched: 6, total: 11 },
     ]
   },
   {
     title: "Saved for Later",
     icon: <Clock size={16} className="text-blue-400" />,
     items: [
-      { id: 4, title: "Atomic Habits", author: "James Clear", img: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=800&q=80" },
-      { id: 5, title: "Deep Work", author: "Cal Newport", img: textureImg },
+      { id: 4, title: "Atomic Habits", author: "James Clear", img: "https://images.unsplash.com/photo-1499750310159-52f0f83ad713?w=800&q=80", watched: 2, total: 7 },
+      { id: 5, title: "Deep Work", author: "Cal Newport", img: textureImg, watched: 5, total: 9 },
     ]
   },
   {
@@ -63,8 +63,8 @@ export default function LibraryPage() {
                       </div>
                     </div>
                     {'watched' in item && 'total' in item && (
-                      <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md">
-                        <span className="text-xs font-medium text-white">{item.watched}/{item.total}</span>
+                      <div className="absolute bottom-2 right-2">
+                        <span className="text-[10px] font-semibold text-white/80 drop-shadow-md">{item.watched}/{item.total}</span>
                       </div>
                     )}
                   </div>
