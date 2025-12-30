@@ -7,11 +7,11 @@ import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 import storyImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 
 const STORIES_LIST = [
-  { id: "1", name: "My Story", img: avatarImg, content: storyImg, time: "2h" },
-  { id: "2", name: "Alex Hormozi", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1552581234-26160f608093?w=800&q=80", time: "5h" },
-  { id: "3", name: "Huberman", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1517021897933-0e0319cfbc28?w=800&q=80", time: "12h" },
-  { id: "4", name: "Naval", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800&q=80", time: "1h" },
-  { id: "5", name: "Daily Stoic", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80", time: "30m" },
+  { id: "1", creatorId: 0, name: "My Story", img: avatarImg, content: storyImg, time: "2h" },
+  { id: "2", creatorId: 7, name: "Alex Hormozi", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1552581234-26160f608093?w=800&q=80", time: "5h" },
+  { id: "3", creatorId: 1, name: "Huberman", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1517021897933-0e0319cfbc28?w=800&q=80", time: "12h" },
+  { id: "4", creatorId: 2, name: "Naval", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800&q=80", time: "1h" },
+  { id: "5", creatorId: 8, name: "Daily Stoic", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=150&h=150&fit=crop&crop=faces", content: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80", time: "30m" },
 ];
 
 const getLikedAccounts = (): Set<string> => {
@@ -229,12 +229,35 @@ export default function StoryPage() {
 
         <div className="absolute top-4 left-0 right-0 z-20 p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Avatar className="w-8 h-8 border border-white/20">
-              <AvatarImage src={story.img} />
-              <AvatarFallback>{story.name[0]}</AvatarFallback>
-            </Avatar>
+            {story.creatorId > 0 ? (
+              <button 
+                onClick={() => setLocation(`/creator/${story.creatorId}`)}
+                className="cursor-pointer hover-elevate rounded-full transition-transform"
+                data-testid="button-story-creator-avatar"
+              >
+                <Avatar className="w-8 h-8 border border-white/20">
+                  <AvatarImage src={story.img} />
+                  <AvatarFallback>{story.name[0]}</AvatarFallback>
+                </Avatar>
+              </button>
+            ) : (
+              <Avatar className="w-8 h-8 border border-white/20">
+                <AvatarImage src={story.img} />
+                <AvatarFallback>{story.name[0]}</AvatarFallback>
+              </Avatar>
+            )}
             <div className="flex gap-2 items-center">
-              <span className="text-white font-medium text-sm drop-shadow-md">{story.name}</span>
+              {story.creatorId > 0 ? (
+                <button 
+                  onClick={() => setLocation(`/creator/${story.creatorId}`)}
+                  className="text-white font-medium text-sm drop-shadow-md cursor-pointer hover:text-accent transition-colors"
+                  data-testid="button-story-creator-name"
+                >
+                  {story.name}
+                </button>
+              ) : (
+                <span className="text-white font-medium text-sm drop-shadow-md">{story.name}</span>
+              )}
               <span className="text-white/60 text-xs drop-shadow-md">{story.time}</span>
             </div>
           </div>

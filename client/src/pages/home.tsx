@@ -20,6 +20,7 @@ const STORIES = [
 const FEED_ITEMS = [
   {
     id: 1,
+    creatorId: 1,
     author: "Andrew Huberman",
     handle: "@hubermanlab",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces",
@@ -31,6 +32,7 @@ const FEED_ITEMS = [
   },
   {
     id: 2,
+    creatorId: 2,
     author: "Naval Ravikant",
     handle: "@naval",
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=faces",
@@ -42,6 +44,7 @@ const FEED_ITEMS = [
   },
   {
     id: 3,
+    creatorId: 3,
     author: "James Clear",
     handle: "@jamesclear",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces",
@@ -237,13 +240,25 @@ export default function HomePage() {
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={item.avatar} />
-                      <AvatarFallback>{item.author[0]}</AvatarFallback>
-                    </Avatar>
+                    <button 
+                      onClick={() => setLocation(`/creator/${item.creatorId}`)}
+                      className="cursor-pointer hover-elevate rounded-full transition-transform"
+                      data-testid={`button-creator-avatar-${item.id}`}
+                    >
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={item.avatar} />
+                        <AvatarFallback>{item.author[0]}</AvatarFallback>
+                      </Avatar>
+                    </button>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                         <span className="text-sm font-medium leading-none">{item.author}</span>
+                         <button 
+                           onClick={() => setLocation(`/creator/${item.creatorId}`)}
+                           className="text-sm font-medium leading-none cursor-pointer hover:text-accent transition-colors"
+                           data-testid={`button-creator-name-${item.id}`}
+                         >
+                           {item.author}
+                         </button>
                          <button className="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-sm transition-colors text-white font-medium" data-testid={`button-follow-${item.id}`}>Follow</button>
                       </div>
                     </div>

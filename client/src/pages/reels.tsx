@@ -10,6 +10,7 @@ import { CommentsPanel } from "@/components/comments-panel";
 const REELS = [
   {
     id: 1,
+    creatorId: 4,
     video: "https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5016-large.mp4",
     author: "Mindset Daily",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces",
@@ -20,6 +21,7 @@ const REELS = [
   },
   {
     id: 2,
+    creatorId: 5,
     video: "https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4",
     author: "Nature Focus",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces",
@@ -30,6 +32,7 @@ const REELS = [
   },
   {
     id: 3,
+    creatorId: 6,
     video: "https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4",
     author: "Daily Wisdom",
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=faces",
@@ -482,11 +485,23 @@ export default function ReelsPage() {
 
       <div className="absolute left-0 bottom-2 z-10 p-4 pr-20 w-full text-white">
         <div className="flex items-center gap-3 mb-3">
-          <Avatar className="w-12 h-12 border-2 border-white">
-            <AvatarImage src={currentReel.avatar} />
-            <AvatarFallback>AU</AvatarFallback>
-          </Avatar>
-          <span className="font-semibold text-base drop-shadow-md" data-testid="text-reel-author">{currentReel.author}</span>
+          <button 
+            onClick={() => setLocation(`/creator/${currentReel.creatorId}`)}
+            className="cursor-pointer hover-elevate rounded-full transition-transform"
+            data-testid="button-reel-creator-avatar"
+          >
+            <Avatar className="w-12 h-12 border-2 border-white">
+              <AvatarImage src={currentReel.avatar} />
+              <AvatarFallback>AU</AvatarFallback>
+            </Avatar>
+          </button>
+          <button 
+            onClick={() => setLocation(`/creator/${currentReel.creatorId}`)}
+            className="font-semibold text-base drop-shadow-md cursor-pointer hover:text-accent transition-colors"
+            data-testid="button-reel-creator-name"
+          >
+            {currentReel.author}
+          </button>
           <button className="px-3 py-1 rounded-md border border-white/30 text-xs font-medium backdrop-blur-sm" data-testid="button-reel-follow">Follow</button>
         </div>
         <p className="text-base opacity-90 leading-relaxed drop-shadow-md" data-testid="text-reel-title">
