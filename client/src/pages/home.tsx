@@ -173,6 +173,32 @@ export default function HomePage() {
     }
   };
 
+  const getFollowedCreators = (): Set<number> => {
+    try {
+      const stored = localStorage.getItem('followedCreators');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  };
+
+  const saveFollowedCreators = (creators: Set<number>) => {
+    localStorage.setItem('followedCreators', JSON.stringify(Array.from(creators)));
+  };
+
+  const [followedCreators, setFollowedCreators] = useState<Set<number>>(() => getFollowedCreators());
+
+  const toggleFollow = (creatorId: number) => {
+    const newFollowedCreators = new Set(followedCreators);
+    if (newFollowedCreators.has(creatorId)) {
+      newFollowedCreators.delete(creatorId);
+    } else {
+      newFollowedCreators.add(creatorId);
+    }
+    setFollowedCreators(newFollowedCreators);
+    saveFollowedCreators(newFollowedCreators);
+  };
+
   const handleCardTap = (e: React.MouseEvent, postId: number) => {
     const currentTime = new Date().getTime();
     const lastTap = lastTapTimeRef.current[postId] || 0;
@@ -259,7 +285,17 @@ export default function HomePage() {
                          >
                            {item.author}
                          </button>
-                         <button className="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-sm transition-colors text-white font-medium" data-testid={`button-follow-${item.id}`}>Follow</button>
+                         <button 
+                           onClick={() => toggleFollow(item.creatorId)}
+                           className={`text-[10px] px-2 py-0.5 rounded-sm transition-colors font-medium ${
+                             followedCreators.has(item.creatorId)
+                               ? 'bg-white/20 text-white'
+                               : 'bg-white/10 hover:bg-white/20 text-white'
+                           }`}
+                           data-testid={`button-follow-${item.id}`}
+                         >
+                           {followedCreators.has(item.creatorId) ? 'Following' : 'Follow'}
+                         </button>
                       </div>
                     </div>
                   </div>

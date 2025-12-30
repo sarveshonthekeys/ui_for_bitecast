@@ -82,6 +82,19 @@ const saveDislikedReels = (reels: Set<number>) => {
   localStorage.setItem('dislikedReels', JSON.stringify(Array.from(reels)));
 };
 
+const getFollowedCreators = (): Set<number> => {
+  try {
+    const stored = localStorage.getItem('followedCreators');
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  } catch {
+    return new Set();
+  }
+};
+
+const saveFollowedCreators = (creators: Set<number>) => {
+  localStorage.setItem('followedCreators', JSON.stringify(Array.from(creators)));
+};
+
 export default function ReelsPage() {
   const [_, setLocation] = useLocation();
   const searchString = useSearch();
@@ -99,6 +112,7 @@ export default function ReelsPage() {
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
+  const [followedCreators, setFollowedCreators] = useState<Set<number>>(() => getFollowedCreators());
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const touchStartX = useRef(0);
@@ -114,6 +128,18 @@ export default function ReelsPage() {
 
   const currentReel = REELS[currentIndex];
   const isCurrentReelLiked = likedReels.has(currentReel.id);
+  const isCurrentCreatorFollowed = followedCreators.has(currentReel.creatorId);
+
+  const toggleFollow = useCallback(() => {
+    const newFollowedCreators = new Set(followedCreators);
+    if (newFollowedCreators.has(currentReel.creatorId)) {
+      newFollowedCreators.delete(currentReel.creatorId);
+    } else {
+      newFollowedCreators.add(currentReel.creatorId);
+    }
+    setFollowedCreators(newFollowedCreators);
+    saveFollowedCreators(newFollowedCreators);
+  }, [followedCreators, currentReel.creatorId]);
 
   const goToNext = useCallback(() => {
     if (isScrolling.current || commentsOpen) return;
@@ -502,7 +528,17 @@ export default function ReelsPage() {
           >
             {currentReel.author}
           </button>
-          <button className="px-3 py-1 rounded-md border border-white/30 text-xs font-medium backdrop-blur-sm" data-testid="button-reel-follow">Follow</button>
+          <button 
+            onClick={toggleFollow}
+            className={`px-3 py-1 rounded-md border text-xs font-medium backdrop-blur-sm transition-colors ${
+              isCurrentCreatorFollowed 
+                ? 'bg-white/10 border-white/30 text-white' 
+                : 'border-white/30 text-white hover:bg-white/10'
+            }`}
+            data-testid="button-reel-follow"
+          >
+            {isCurrentCreatorFollowed ? 'Following' : 'Follow'}
+          </button>
         </div>
         <p className="text-base opacity-90 leading-relaxed drop-shadow-md" data-testid="text-reel-title">
           {currentReel.title}

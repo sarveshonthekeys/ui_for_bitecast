@@ -42,7 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className={cn("rounded-full p-1", isReels ? "bg-white/10" : "")}>
               <Radio size={24} strokeWidth={location === "/reels" ? 2.5 : 2} />
             </div>
-            <span className="text-[10px] font-medium">Reels</span>
+            <span className="text-[10px] font-medium">Bites</span>
           </Link>
           <Link href="/library" className={cn("flex flex-col items-center gap-1 p-2 transition-colors", location === "/library" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}>
             <Library size={22} strokeWidth={location === "/library" ? 2.5 : 2} />
