@@ -63,7 +63,7 @@ export default function ReelsPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showHashtags, setShowHashtags] = useState(false);
-  const [slideDirection, setSlideDirection] = useState<"up" | "down">("up");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("left");
   const [likedReels, setLikedReels] = useState<Set<number>>(() => getLikedReels());
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -88,7 +88,7 @@ export default function ReelsPage() {
     if (isScrolling.current || commentsOpen) return;
     if (currentIndex < REELS.length - 1) {
       isScrolling.current = true;
-      setSlideDirection("up");
+      setSlideDirection("left");
       setCurrentIndex(currentIndex + 1);
       setShowHashtags(false);
       setTimeout(() => { isScrolling.current = false; }, 400);
@@ -99,7 +99,7 @@ export default function ReelsPage() {
     if (isScrolling.current || commentsOpen) return;
     if (currentIndex > 0) {
       isScrolling.current = true;
-      setSlideDirection("down");
+      setSlideDirection("right");
       setCurrentIndex(currentIndex - 1);
       setShowHashtags(false);
       setTimeout(() => { isScrolling.current = false; }, 400);
@@ -280,16 +280,16 @@ export default function ReelsPage() {
   }, [currentIndex, isPlaying]);
 
   const slideVariants = {
-    enter: (direction: "up" | "down") => ({
-      y: direction === "up" ? "100%" : "-100%",
+    enter: (direction: "left" | "right") => ({
+      x: direction === "left" ? "100%" : "-100%",
       opacity: 0.8,
     }),
     center: {
-      y: 0,
+      x: 0,
       opacity: 1,
     },
-    exit: (direction: "up" | "down") => ({
-      y: direction === "up" ? "-100%" : "100%",
+    exit: (direction: "left" | "right") => ({
+      x: direction === "left" ? "-100%" : "100%",
       opacity: 0.8,
     }),
   };
