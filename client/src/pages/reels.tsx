@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { Heart, MessageCircle, Send, MoreVertical, ThumbsDown, ChevronLeft } from "lucide-react";
+import { Heart, MessageCircle, Send, MoreVertical, ThumbsDown, ChevronLeft, Bookmark } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
 import reelThumb from "@assets/generated_images/moody_nature_reel_thumbnail.png";
@@ -53,6 +53,19 @@ const saveLikedReels = (reels: Set<number>) => {
   localStorage.setItem('likedReels', JSON.stringify(Array.from(reels)));
 };
 
+const getSavedReels = (): Set<number> => {
+  try {
+    const stored = localStorage.getItem('savedReels');
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  } catch {
+    return new Set();
+  }
+};
+
+const saveSavedReels = (reels: Set<number>) => {
+  localStorage.setItem('savedReels', JSON.stringify(Array.from(reels)));
+};
+
 export default function ReelsPage() {
   const [_, setLocation] = useLocation();
   const searchString = useSearch();
@@ -65,6 +78,7 @@ export default function ReelsPage() {
   const [showHashtags, setShowHashtags] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("left");
   const [likedReels, setLikedReels] = useState<Set<number>>(() => getLikedReels());
+  const [savedReels, setSavedReels] = useState<Set<number>>(() => getSavedReels());
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
@@ -128,6 +142,19 @@ export default function ReelsPage() {
     setLikedReels(newLikedReels);
     saveLikedReels(newLikedReels);
   }, [likedReels, currentReel.id, showHeart]);
+
+  const toggleSave = useCallback(() => {
+    const newSavedReels = new Set(savedReels);
+    if (newSavedReels.has(currentReel.id)) {
+      newSavedReels.delete(currentReel.id);
+    } else {
+      newSavedReels.add(currentReel.id);
+    }
+    setSavedReels(newSavedReels);
+    saveSavedReels(newSavedReels);
+  }, [savedReels, currentReel.id]);
+
+  const isCurrentReelSaved = savedReels.has(currentReel.id);
 
   const handleDoubleTap = useCallback(() => {
     if (!isCurrentReelLiked) {
@@ -376,6 +403,19 @@ export default function ReelsPage() {
             />
           </button>
           <span className="text-xs font-medium text-white drop-shadow-md">{currentReel.likes}</span>
+        </div>
+
+        <div className="flex flex-col items-center gap-1">
+          <button 
+            className="p-2 rounded-full hover:bg-white/10 transition-colors" 
+            onClick={toggleSave}
+            data-testid="button-reel-save"
+          >
+            <Bookmark 
+              size={28} 
+              className={isCurrentReelSaved ? "text-white fill-white drop-shadow-sm" : "text-white drop-shadow-sm"} 
+            />
+          </button>
         </div>
 
         <div className="flex flex-col items-center gap-1">
