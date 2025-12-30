@@ -158,14 +158,14 @@ export default function ReelsPage() {
     const diffY = touchStartY.current - touchEndY;
     const diffX = touchStartX.current - touchEndX;
 
-    // Horizontal swipe for next/previous reels
+    // Horizontal swipe for next/previous reels (inverted)
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
       if (diffX > 0) {
-        // Swiped left - previous reel
-        goToPrev();
-      } else {
-        // Swiped right - next reel
+        // Swiped left - next reel (inverted)
         goToNext();
+      } else {
+        // Swiped right - previous reel (inverted)
+        goToPrev();
       }
       return;
     }
@@ -201,14 +201,14 @@ export default function ReelsPage() {
   const handleWheel = (e: React.WheelEvent) => {
     if (commentsOpen) return;
     
-    // Handle horizontal scrolling (left/right)
+    // Handle horizontal scrolling (left/right) - inverted
     if (Math.abs(e.deltaX) > 30) {
       if (e.deltaX < 0) {
-        // Scrolling left - previous reel
-        goToPrev();
-      } else if (e.deltaX > 0) {
-        // Scrolling right - next reel
+        // Scrolling left - next reel (inverted)
         goToNext();
+      } else if (e.deltaX > 0) {
+        // Scrolling right - previous reel (inverted)
+        goToPrev();
       }
       return;
     }
@@ -294,6 +294,13 @@ export default function ReelsPage() {
     }),
   };
 
+  const transitionConfig = {
+    type: "spring" as const,
+    stiffness: 300,
+    damping: 30,
+    mass: 1,
+  };
+
   return (
     <div 
       ref={containerRef}
@@ -310,7 +317,7 @@ export default function ReelsPage() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
+          transition={transitionConfig}
           className="absolute inset-0 z-0 bg-neutral-900"
         >
           <video 
