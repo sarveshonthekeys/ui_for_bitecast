@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { Heart, MessageCircle, Send, MoreVertical, ThumbsDown, ChevronLeft, Bookmark } from "lucide-react";
+import { Heart, MessageCircle, MoreVertical, ThumbsDown, ChevronLeft, Bookmark } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
 import reelThumb from "@assets/generated_images/moody_nature_reel_thumbnail.png";
@@ -436,10 +436,6 @@ export default function ReelsPage() {
             <span className="text-xs font-medium text-white drop-shadow-md">{currentReel.comments}</span>
           </div>
         </CommentsPanel>
-
-        <button className="p-2 rounded-full hover:bg-white/10 transition-colors" data-testid="button-reel-share">
-          <Send size={28} className="text-white drop-shadow-sm -rotate-45" />
-        </button>
       </div>
 
       <button 

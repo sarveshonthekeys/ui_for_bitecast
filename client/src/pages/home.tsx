@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Play, MoreHorizontal, Heart, MessageCircle, Share2, Bookmark, Bell } from "lucide-react";
+import { Play, MoreHorizontal, Heart, MessageCircle, Bookmark, Bell } from "lucide-react";
 import avatarImg from "@assets/generated_images/minimalist_portrait_avatar.png";
 import cardImg from "@assets/generated_images/moody_nature_reel_thumbnail.png";
 import { motion } from "framer-motion";
@@ -116,6 +116,7 @@ function ReelCarousel({ onReelClick }: { onReelClick: (id: number) => void }) {
 export default function HomePage() {
   const [_, setLocation] = useLocation();
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
+  const [savedPosts, setSavedPosts] = useState<Set<number>>(new Set());
   const lastTapTimeRef = useRef<{ [key: number]: number }>({});
 
   const handlePostClick = (postId: number) => {
@@ -128,6 +129,18 @@ export default function HomePage() {
 
   const toggleLike = (postId: number) => {
     setLikedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSave = (postId: number) => {
+    setSavedPosts(prev => {
       const newSet = new Set(prev);
       if (newSet.has(postId)) {
         newSet.delete(postId);
@@ -197,6 +210,7 @@ export default function HomePage() {
       <div className="px-4 space-y-6">
         {FEED_ITEMS.map((item, i) => {
           const isLiked = likedPosts.has(item.id);
+          const isSaved = savedPosts.has(item.id);
           
           return (
             <div key={item.id}>
@@ -265,12 +279,15 @@ export default function HomePage() {
                         <span className="text-xs font-medium text-muted-foreground">{item.comments}</span>
                       </Button>
                     </CommentsPanel>
-                    <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white" data-testid={`button-share-${item.id}`}>
-                      <Share2 className="w-6 h-6" />
-                    </Button>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-auto w-auto p-0 hover:bg-transparent text-white" data-testid={`button-bookmark-${item.id}`}>
-                    <Bookmark className="w-6 h-6" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-auto w-auto p-0 hover:bg-transparent text-white" 
+                    onClick={() => toggleSave(item.id)}
+                    data-testid={`button-bookmark-${item.id}`}
+                  >
+                    <Bookmark className={`w-6 h-6 ${isSaved ? 'fill-white' : ''}`} />
                   </Button>
                 </div>
                 
