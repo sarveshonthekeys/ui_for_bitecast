@@ -14,6 +14,8 @@ const DISCOVERY_CARDS = [
   { id: 2, title: "Stoicism", subtitle: "Ancient Wisdom", color: "bg-orange-900/40", img: textureImg },
   { id: 3, title: "Biohacking", subtitle: "Optimize Health", color: "bg-emerald-900/40", img: null },
   { id: 4, title: "Psychology", subtitle: "Human Mind", color: "bg-purple-900/40", img: null },
+  { id: 5, title: "Mindfulness", subtitle: "Mental Peace", color: "bg-teal-900/40", img: null },
+  { id: 6, title: "Productivity", subtitle: "Time Mastery", color: "bg-amber-900/40", img: null },
 ];
 
 const EXPLORE_FEED = [
