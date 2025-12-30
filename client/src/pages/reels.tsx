@@ -170,28 +170,28 @@ export default function ReelsPage() {
       return;
     }
 
-    // Vertical swipe for description panel and navigation
+    // Vertical swipe for description panel and navigation (inverted)
     if (Math.abs(diffY) > 50) {
       if (showDescription) {
-        if (diffY > 0) {
-          // Swiped down in description
+        if (diffY < 0) {
+          // Swiped up in description (inverted)
           if (descriptionScrollRef.current === 0) {
-            // First swipe down - hide description
+            // First swipe up - hide description
             descriptionScrollRef.current = 1;
             setShowDescription(false);
           } else {
-            // Second swipe down - go back
+            // Second swipe up - go back
             descriptionScrollRef.current = 0;
             handleBack();
           }
         }
       } else {
-        if (diffY < 0) {
-          // Swiped up - show description
+        if (diffY > 0) {
+          // Swiped down - show description (inverted)
           setShowDescription(true);
           descriptionScrollRef.current = 0;
-        } else if (diffY > 0) {
-          // Swiped down - go back to previous page
+        } else if (diffY < 0) {
+          // Swiped up - go back to previous page (inverted)
           handleBack();
         }
       }
@@ -213,27 +213,27 @@ export default function ReelsPage() {
       return;
     }
     
-    // Handle vertical scrolling (up/down)
+    // Handle vertical scrolling (up/down) - inverted
     if (showDescription) {
-      if (e.deltaY > 30) {
-        // Scrolling down in description
+      if (e.deltaY < -30) {
+        // Scrolling up in description (inverted)
         if (descriptionScrollRef.current === 0) {
-          // First scroll down - hide description
+          // First scroll up - hide description
           descriptionScrollRef.current = 1;
           setShowDescription(false);
         } else {
-          // Second scroll down - go back
+          // Second scroll up - go back
           descriptionScrollRef.current = 0;
           handleBack();
         }
       }
     } else {
-      if (e.deltaY < -30) {
-        // Scrolling up - show description
+      if (e.deltaY > 30) {
+        // Scrolling down - show description (inverted)
         setShowDescription(true);
         descriptionScrollRef.current = 0;
-      } else if (e.deltaY > 30) {
-        // Scrolling down - go back to previous page
+      } else if (e.deltaY < -30) {
+        // Scrolling up - go back to previous page (inverted)
         handleBack();
       }
     }
