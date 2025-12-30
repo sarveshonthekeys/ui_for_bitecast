@@ -161,11 +161,11 @@ export default function ReelsPage() {
     // Horizontal swipe for next/previous reels
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
       if (diffX > 0) {
-        // Swiped left - next reel
-        goToNext();
-      } else {
-        // Swiped right - previous reel
+        // Swiped left - previous reel
         goToPrev();
+      } else {
+        // Swiped right - next reel
+        goToNext();
       }
       return;
     }
@@ -204,11 +204,11 @@ export default function ReelsPage() {
     // Handle horizontal scrolling (left/right)
     if (Math.abs(e.deltaX) > 30) {
       if (e.deltaX < 0) {
-        // Scrolling left - next reel
-        goToNext();
-      } else if (e.deltaX > 0) {
-        // Scrolling right - previous reel
+        // Scrolling left - previous reel
         goToPrev();
+      } else if (e.deltaX > 0) {
+        // Scrolling right - next reel
+        goToNext();
       }
       return;
     }
